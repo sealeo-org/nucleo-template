@@ -54,17 +54,17 @@ COMPILE = $(COMPILER) $(FLAGS) $(INCLUDES) -c
 LINK = $(COMPILER) $(FLAGS)
 
 ifneq ($(filter $(MAKECMDGOALS), lib),)
-  COMPILE += -fPIC
+COMPILE += -fPIC
 endif
 
 # Compute progress
 ifndef ECHO
-  T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
-                        -nrRf $(firstword $(MAKEFILE_LIST)) \
-                 ECHO="echo COUNTTHIS" | grep -c "COUNTTHIS")
-  N := x
-  C = $(words $N)$(eval N := x $N)
-  ECHO = printf "["; printf "%3.3s" "`expr $C \* 100 / $T`"; echo "%]"
+T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
+                    -nrRf $(firstword $(MAKEFILE_LIST)) \
+             ECHO="echo COUNTTHIS" | grep -c "COUNTTHIS")
+N := x
+C = $(words $N)$(eval N := x $N)
+ECHO = printf "["; printf "%3.3s" "`expr $C \* 100 / $T`"; echo "%]"
 endif
 
 #-------------------------------------
@@ -82,11 +82,13 @@ all: $(PROGRAM) test
 $(PROGRAM): $(DEPS) $(OBJS) $(dir $(PROGRAM))
 ifneq ($(OBJS),)
 	@$(LINK) $(OBJS) $(LIBS) -o $@
+	@$(CHOWN) $@
 	@$(ECHO) Linking $@
 endif
 
 $(dir $(PROGRAM)):
 	@mkdir -p $@
+	@$(CHOWN) $@
 
 test: FORCE $(TESTS_DIR)/tests
 ifneq ($(TESTS_DIR),)
@@ -103,6 +105,7 @@ gen_deps:
 
 lib: $(DEPS) $(OBJS)
 	$(LINK) -shared -o lib$(PROGRAM).so $(OBJS)
+	@$(CHOWN) lib$(PROGRAM).so
 
 #----------------------------------------
 # Rules for generating object files (.o).
@@ -110,14 +113,17 @@ lib: $(DEPS) $(OBJS)
 
 %.o:%.c
 	@$(COMPILE) $< -o $@
+	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
 %.o:%.cpp
 	@$(COMPILE) $< -o $@
+	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
 %.o:%.S
 	@$(COMPILE) $< -o $@
+	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
 #------------------------------------------
@@ -126,12 +132,15 @@ lib: $(DEPS) $(OBJS)
 
 %.d:%.c
 	@$(DEPEND) -MT $(basename $@).o $*.c > $*.d
+	@$(CHOWN) $@
 
 %.d:%.cpp
 	@$(DEPEND) -MT $(basename $@).o $*.cpp > $*.d
+	@$(CHOWN) $@
 
 %.d:%.S
 	@$(DEPEND) -MT $(basename $@).o $*.S > $*.d
+	@$(CHOWN) $@
 
 #-------------------
 # Rules for cleaning

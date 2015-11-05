@@ -5,10 +5,14 @@ DEBUGGER    = gdb               # The debugger to use with make debug
 
 # These variables are not intended to be modified
 PWD         = $(shell pwd)
+UID         = $(shell id -u)
+GID         = $(shell id -g)
 MOUNTPOINT  = /firmware
 MEDIA       = /$(shell lsblk|grep $(NUCLEO)|tr -d ' '|cut -d'/' -f2-)
 MEDIAOK     = $(shell [ $(MEDIA) = "/" ] && echo -n "1")
-DOCKER      = docker run --rm -v $(PWD):$(MOUNTPOINT) $(IMAGE) make -C$(MOUNTPOINT) -f.nucleo.mk
+DOCKERMOUNT = -v $(PWD):$(MOUNTPOINT)
+DOCKERMAKE  = make -C$(MOUNTPOINT) UID=$(UID) GID=$(GID) VERBOSE=1 -f.nucleo.mk
+DOCKER      = docker run --rm $(DOCKERMOUNT) $(IMAGE) $(DOCKERMAKE)
 BINARY      = build/nucleo.bin
 ELF         = build/nucleo.elf
 CP          = cp -p

@@ -25,6 +25,8 @@ HDREXTS = .h
 
 RM = rm -f
 
+CHOWN = chown $(UID):$(GID)
+
 include .generic.mk
 
 ALL_INCLUDES_DIRS += /usr/include/newlib/c++/4.8 /usr/include/newlib/c++/4.8/arm-none-eabi
@@ -34,12 +36,14 @@ hex: $(PROGRAM:%.elf=%.hex)
 bin: $(PROGRAM:%.elf=%.bin)
 
 %.hex: %.elf
-	@$(ECHO) Generating $@
 	@arm-none-eabi-objcopy -Oihex $< $@
+	@$(CHOWN) $@
+	@$(ECHO) Generating $@
 
 %.bin: %.elf
-	@$(ECHO) Generating $@
 	@arm-none-eabi-objcopy -O binary $< $@
+	@$(CHOWN) $@
+	@$(ECHO) Generating $@
 
 flash: $(PROGRAM:%.elf=%.hex)
 	@$(ECHO) Flashing $<
@@ -47,4 +51,5 @@ flash: $(PROGRAM:%.elf=%.hex)
 
 %.o:%.cpp
 	@$(COMPILE) -std=gnu++0x $< -o $@
-	@$(ECHO) Compiling $<
+	@$(CHOWN) $@
+#	@$(ECHO) Compiling $<
