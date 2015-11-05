@@ -25,7 +25,7 @@ HDREXTS = .h
 
 RM = rm -f
 
-include generic.mk
+include .generic.mk
 
 ALL_INCLUDES_DIRS += /usr/include/newlib/c++/4.8 /usr/include/newlib/c++/4.8/arm-none-eabi
 
