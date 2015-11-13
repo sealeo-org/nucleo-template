@@ -4,9 +4,10 @@ FLAGS = -D__HEAP_SIZE=0x0000 -D__STACK_SIZE=0x0100 -DSTM32F401RE \
         -fno-strict-aliasing -DSTM32F4XX -Wall -fdata-sections -ffunction-sections -O0 -ggdb \
         -DTARGET_NUCLEO_F401RE --specs=nosys.specs -mcpu=cortex-m4 -mlittle-endian \
         -mthumb -mthumb-interwork -DSTM32F401xE -Tsrc/stm32f401re_flash.ld \
-        -Wl,--gc-sections,--defsym=__HEAP_SIZE=0x0000,--defsym=__STACK_SIZE=0x0100 -std=c++11
+        -Wl,--gc-sections,--defsym=__HEAP_SIZE=0x0000,--defsym=__STACK_SIZE=0x0100
+CPPFLAGS = -std=c++11
 
-LIBS = -lstdc++ -lm
+LIBS = -lstdc++ -lm $(LDFLAGS)
 
 MAXDEPTH = 5
 
@@ -50,6 +51,6 @@ flash: $(PROGRAM:%.elf=%.hex)
 	@sudo openocd -f .openocd.cfg
 
 %.o:%.cpp
-	@$(COMPILE) -std=gnu++0x $< -o $@
+	@$(COMPILECPP) $< -o $@
 	@$(CHOWN) $@
-#	@$(ECHO) Compiling $<
+	@$(ECHO) Compiling $<

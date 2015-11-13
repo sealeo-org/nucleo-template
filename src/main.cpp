@@ -1,10 +1,7 @@
 #include <mbed.h>
-
-DigitalOut led(LED1);
+#include <ST_F401_84MHZ.h>
 
 int main() {
-    while(1){
-        led = !led;
-	wait(0.5);
-    }
+    F401_init84 NucleoF401RE(0);
+    for(;;);
 }

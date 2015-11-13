@@ -48,13 +48,16 @@ DEPS = gen_deps $(SOURCE_OBJS:.o=.d)
 
 # Define some useful variables.
 DEP_OPT = $(shell if `$(COMPILER) --version | grep "GCC" >/dev/null`; then echo "-MM -MP"; else echo "-M"; fi )
-DEPEND = $(COMPILER) $(DEP_OPT) $(FLAGS) $(INCLUDES)
-DEPEND.d = $(subst -g,, $(DEPEND))
-COMPILE = $(COMPILER) $(FLAGS) $(INCLUDES) -c
-LINK = $(COMPILER) $(FLAGS)
+DEPENDC     = $(COMPILER) $(DEP_OPT) $(FLAGS) $(INCLUDES)
+DEPENDCPP   = $(COMPILER) $(DEP_OPT) $(FLAGS) $(CPPFLAGS) $(INCLUDES)
+DEPEND.d = $(subst -g,, $(DEPENDC))
+COMPILEC    = $(COMPILER) $(FLAGS) $(INCLUDES) -c
+COMPILECPP  = $(COMPILER) $(FLAGS) $(CPPFLAGS) $(INCLUDES) -c
+LINK = $(COMPILER) $(FLAGS) $(CPPFLAGS)
 
 ifneq ($(filter $(MAKECMDGOALS), lib),)
-COMPILE += -fPIC
+COMPILEC    += -fPIC
+COMPILECPP  += -fPIC
 endif
 
 # Compute progress
@@ -112,17 +115,17 @@ lib: $(DEPS) $(OBJS)
 #----------------------------------------
 
 %.o:%.c
-	@$(COMPILE) $< -o $@
+	@$(COMPILEC) $< -o $@
 	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
 %.o:%.cpp
-	@$(COMPILE) $< -o $@
+	@$(COMPILECPP) $< -o $@
 	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
 %.o:%.S
-	@$(COMPILE) $< -o $@
+	@$(COMPILECPP) $< -o $@
 	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
@@ -131,15 +134,15 @@ lib: $(DEPS) $(OBJS)
 #------------------------------------------
 
 %.d:%.c
-	@$(DEPEND) -MT $(basename $@).o $*.c > $*.d
+	@$(DEPENDC) -MT $(basename $@).o $*.c > $*.d
 	@$(CHOWN) $@
 
 %.d:%.cpp
-	@$(DEPEND) -MT $(basename $@).o $*.cpp > $*.d
+	@$(DEPENDCPP) -MT $(basename $@).o $*.cpp > $*.d
 	@$(CHOWN) $@
 
 %.d:%.S
-	@$(DEPEND) -MT $(basename $@).o $*.S > $*.d
+	@$(DEPENDCPP) -MT $(basename $@).o $*.S > $*.d
 	@$(CHOWN) $@
 
 #-------------------
@@ -195,8 +198,10 @@ show:
 	@echo -e "EXCLUDE_DIRS : $(EXPANDED_EXCLUDE_DIRS)\n"
 	@echo -e "OBJS : $(OBJS)\n"
 	@echo -e "DEPS : $(DEPS)\n"
-	@echo -e "DEPEND : $(DEPEND)\n"
-	@echo -e "COMPILE : $(COMPILE)\n"
+	@echo -e "DEPENDC: $(DEPENDC)\n"
+	@echo -e "DEPENDCPP:  $(DEPENDCPP)\n"
+	@echo -e "COMPILEC: $(COMPILEC)\n"
+	@echo -e "COMPILECPP: $(COMPILECPP)\n"
 	@echo -e "LINK : $(LINK)\n"
 	@echo -e "INCLUDES : $(INCLUDES)\n"
 	@echo -e "TESTS_SOURCES_DIRS : $(TESTS_SOURCES_DIRS)\n"
