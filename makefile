@@ -5,7 +5,8 @@ DEBUGGER    = gdb               # The debugger to use with make debug
 
 # These variables are to use or deploy libraries
 LDFLAGS     =
-LIBNAME     = $(shell basename $(shell pwd))    # Default value: your project directory's name
+# Default value: your project directory's name
+LIBNAME     = $(shell basename $(shell pwd))
 LIBOBJ      = 
 
 # These variables are not intended to be modified
