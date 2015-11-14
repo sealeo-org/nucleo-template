@@ -18,7 +18,7 @@ EXCLUDE_FILES = src/periodiccaller.cpp mbed/targets/cmsis/TARGET_STM/TARGET_NUCL
 
 OBJECT_FILES = mbed/TARGET_NUCLEO_F401RE/TOOLCHAIN_GCC_ARM/*.o
 
-COMPILER = arm-none-eabi-gcc
+COMPILER = arm-none-eabi-g++
 
 SRCEXTS = .cpp .c .S
 
