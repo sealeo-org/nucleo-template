@@ -47,13 +47,13 @@ OBJS = $(SOURCE_OBJS) $(wildcard $(OBJECT_FILES))
 DEPS = gen_deps $(SOURCE_OBJS:.o=.d)
 
 # Define some useful variables.
-DEP_OPT = $(shell if `$(COMPILER) --version | grep "GCC" >/dev/null`; then echo "-MM -MP"; else echo "-M"; fi )
-DEPENDC     = $(COMPILER) $(DEP_OPT) $(FLAGS) $(INCLUDES)
-DEPENDCPP   = $(COMPILER) $(DEP_OPT) $(FLAGS) $(CPPFLAGS) $(INCLUDES)
+DEP_OPT = $(shell if `$(CCOMPILER) --version | grep "GCC" >/dev/null`; then echo "-MM -MP"; else echo "-M"; fi )
+DEPENDC     = $(CCOMPILER) $(DEP_OPT) $(FLAGS) $(INCLUDES)
+DEPENDCPP   = $(CXXCOMPILER) $(DEP_OPT) $(FLAGS) $(CPPFLAGS) $(INCLUDES)
 DEPEND.d = $(subst -g,, $(DEPENDC))
-COMPILEC    = $(COMPILER) $(FLAGS) $(INCLUDES) -c
-COMPILECPP  = $(COMPILER) $(FLAGS) $(CPPFLAGS) $(INCLUDES) -c
-LINK = $(COMPILER) $(FLAGS) $(CPPFLAGS)
+COMPILEC    = $(CCOMPILER) $(FLAGS) $(INCLUDES) -c
+COMPILECPP  = $(CXXCOMPILER) $(FLAGS) $(CPPFLAGS) $(INCLUDES) -c
+LINK = $(CXXCOMPILER) $(FLAGS) $(CPPFLAGS)
 
 ifneq ($(filter $(MAKECMDGOALS), lib),)
 COMPILEC    += -fPIC

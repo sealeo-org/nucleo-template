@@ -2,12 +2,13 @@
 IMAGE       = nucleo            # The Docker image name (given at build time by -t)
 NUCLEO      = NODE_F401RE       # The Nucleo directory name when mounted
 DEBUGGER    = gdb               # The debugger to use with make debug
+DEBUGMODE   = 1                 # comment this line to enter in release mode
 
 # These variables are to use or deploy libraries
 LDFLAGS     =
 # Default value: your project directory's name
 LIBNAME     = $(shell basename $(shell pwd))
-LIBOBJ      = 
+LIBOBJ      =
 
 # These variables are not intended to be modified
 PWD         = $(shell pwd)
@@ -17,7 +18,13 @@ MOUNTPOINT  = /firmware
 MEDIA       = /$(shell lsblk|grep $(NUCLEO)|tr -d ' '|cut -d'/' -f2-)
 MEDIAOK     = $(shell [ $(MEDIA) = "/" ] && echo -n "1")
 DOCKERMOUNT = -v $(PWD):$(MOUNTPOINT)
-DOCKERMAKE  = make -C$(MOUNTPOINT) UID=$(UID) GID=$(GID) LDFLAGS="$(LDFLAGS)" VERBOSE=1 -f.nucleo.mk
+ifneq ($(DEBUGMODE),)
+DFLAGS      = -O0 -ggdb
+else
+DFLAGS      = -O3
+endif
+MAKEARGS    = UID="$(UID)" GID="$(GID)" LDFLAGS="$(LDFLAGS)" DFLAGS="$(DFLAGS)"
+DOCKERMAKE  = make -C$(MOUNTPOINT) $(MAKEARGS) -f.nucleo.mk
 DOCKER      = docker run --rm $(DOCKERMOUNT) $(IMAGE) $(DOCKERMAKE)
 BINARY      = build/nucleo.bin
 ELF         = build/nucleo.elf
@@ -48,3 +55,6 @@ clean:
 
 purge:
 	@$(DOCKER) distclean
+
+%:
+	@$(DOCKER) $@

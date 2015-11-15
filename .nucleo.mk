@@ -1,10 +1,10 @@
 PROGRAM = build/nucleo.elf
 
 FLAGS = -D__HEAP_SIZE=0x0000 -D__STACK_SIZE=0x0100 -DSTM32F401RE \
-        -fno-strict-aliasing -DSTM32F4XX -Wall -fdata-sections -ffunction-sections -O0 -ggdb \
+        -fno-strict-aliasing -DSTM32F4XX -Wall -fdata-sections -ffunction-sections \
         -DTARGET_NUCLEO_F401RE --specs=nosys.specs -mcpu=cortex-m4 -mlittle-endian \
         -mthumb -mthumb-interwork -DSTM32F401xE -Tsrc/stm32f401re_flash.ld \
-        -Wl,--gc-sections,--defsym=__HEAP_SIZE=0x0000,--defsym=__STACK_SIZE=0x0100
+        -Wl,--gc-sections,--defsym=__HEAP_SIZE=0x0000,--defsym=__STACK_SIZE=0x0100 $(DFLAGS)
 CPPFLAGS = -std=c++11
 
 LIBS = -lstdc++ -lm $(LDFLAGS)
@@ -18,7 +18,8 @@ EXCLUDE_FILES = src/periodiccaller.cpp mbed/targets/cmsis/TARGET_STM/TARGET_NUCL
 
 OBJECT_FILES = mbed/TARGET_NUCLEO_F401RE/TOOLCHAIN_GCC_ARM/*.o
 
-COMPILER = arm-none-eabi-g++
+CCOMPILER   = arm-none-eabi-gcc
+CXXCOMPILER = arm-none-eabi-g++
 
 SRCEXTS = .cpp .c .S
 
