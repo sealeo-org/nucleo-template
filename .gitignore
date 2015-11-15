@@ -1,7 +1,6 @@
 *.o
 *.d
 *.d.*
-lib
 build
 .kdev4
 *.kdev4
