@@ -5,7 +5,7 @@ DEBUGGER    = gdb               # The debugger to use with make debug
 DEBUGMODE   = 1                 # comment this line to enter in release mode
 
 # These variables are to use or deploy libraries
-LDFLAGS     =
+LDFLAGS     = -lm
 # Default value: your project directory's name
 LIBNAME     = $(shell basename $(shell pwd))
 LIBOBJ      =

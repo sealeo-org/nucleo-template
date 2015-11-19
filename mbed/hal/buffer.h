@@ -1,5 +1,5 @@
 /* mbed Microcontroller Library
- * Copyright (c) 2006-2013 ARM Limited
+ * Copyright (c) 2014-2015 ARM Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,32 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "semihost_api.h"
-#include "mbed_interface.h"
-#if DEVICE_STDIO_MESSAGES
-#include <stdio.h>
-#endif
+#ifndef MBED_BUFFER_H
+#define MBED_BUFFER_H
 
-#ifdef TOOLCHAIN_GCC_CW
-// TODO: Ideally, we would like to define directly "_ExitProcess"
-void mbed_exit(int return_code) {
-#else
-void exit(int return_code) {
-#endif
+#include <stddef.h>
 
-#if DEVICE_STDIO_MESSAGES
-    fflush(stdout);
-    fflush(stderr);
-#endif
+/** Generic buffer structure
+ */
+typedef struct buffer_s {
+    void    *buffer; /**< the pointer to a buffer */
+    size_t   length; /**< the buffer length */
+    size_t   pos;    /**< actual buffer position */
+    uint8_t  width;  /**< The buffer unit width (8, 16, 32, 64), used for proper *buffer casting */
+} buffer_t;
 
-#if DEVICE_SEMIHOST
-    if (mbed_interface_connected()) {
-        semihost_exit();
-    }
 #endif
-    if (return_code) {
-        mbed_die();
-    }
-
-    while (1);
-}

@@ -57,6 +57,7 @@ struct port_s {
 struct analogin_s {
     ADCName adc;
     PinName pin;
+    uint8_t channel;
 };
 
 struct serial_s {
@@ -94,13 +95,8 @@ struct pwmout_s {
     PinName pin;
     uint32_t period;
     uint32_t pulse;
-};
-
-struct qei_s
-{
-    QEIName qei;
-    PinName T1;
-    PinName T2;
+    uint8_t channel;
+    uint8_t inverted;
 };
 
 #include "gpio_object.h"

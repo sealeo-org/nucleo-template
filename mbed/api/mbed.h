@@ -16,7 +16,7 @@
 #ifndef MBED_H
 #define MBED_H
 
-#define MBED_LIBRARY_VERSION 89
+#define MBED_LIBRARY_VERSION 109
 
 #include "platform.h"
 
@@ -49,12 +49,14 @@
 #include "Ethernet.h"
 #include "CAN.h"
 #include "RawSerial.h"
-#include "QEI.h"
 
 // mbed Internal components
 #include "Timer.h"
 #include "Ticker.h"
 #include "Timeout.h"
+#include "LowPowerTimeout.h"
+#include "LowPowerTicker.h"
+#include "LowPowerTimer.h"
 #include "LocalFileSystem.h"
 #include "InterruptIn.h"
 #include "wait_api.h"

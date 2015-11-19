@@ -1,4 +1,4 @@
-;/* mbed Microcontroller Library
+/* mbed Microcontroller Library
  * Copyright (c) 2006-2013 ARM Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

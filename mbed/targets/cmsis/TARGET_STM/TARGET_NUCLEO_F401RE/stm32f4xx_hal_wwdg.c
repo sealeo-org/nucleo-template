@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32f4xx_hal_wwdg.c
   * @author  MCD Application Team
-  * @version V1.1.0RC2
-  * @date    14-May-2014
+  * @version V1.4.1
+  * @date    09-October-2015
   * @brief   WWDG HAL module driver.
   *          This file provides firmware functions to manage the following 
   *          functionalities of the Window Watchdog (WWDG) peripheral:
@@ -40,7 +40,7 @@
                      ##### How to use this driver #####
   ==============================================================================
   [..]
-    (+) Enable WWDG APB1 clock using __WWDG_CLK_ENABLE().
+    (+) Enable WWDG APB1 clock using __HAL_RCC_WWDG_CLK_ENABLE().
     (+) Set the WWDG prescaler, refresh window and counter value 
         using HAL_WWDG_Init() function.
     (+) Start the WWDG using HAL_WWDG_Start() function.
@@ -62,15 +62,15 @@
        Below the list of most used macros in WWDG HAL driver.
        
       (+) __HAL_WWDG_ENABLE: Enable the WWDG peripheral 
-      (+) __HAL_IWDG_GET_FLAG: Get the selected WWDG's flag status
-      (+) __HAL_IWDG_CLEAR_FLAG: Clear the WWDG's pending flags 
-      (+) __HAL_IWDG_RELOAD_COUNTER: Enables the WWDG early wakeup interrupt  
+      (+) __HAL_WWDG_GET_FLAG: Get the selected WWDG's flag status
+      (+) __HAL_WWDG_CLEAR_FLAG: Clear the WWDG's pending flags 
+      (+) __HAL_WWDG_ENABLE_IT:  Enables the WWDG early wake-up interrupt 
 
   @endverbatim
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -104,7 +104,7 @@
   * @{
   */
 
-/** @defgroup WWDG 
+/** @defgroup WWDG WWDG
   * @brief WWDG HAL module driver.
   * @{
   */
@@ -116,13 +116,12 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
-
-/** @defgroup WWDG_Private_Functions
+/* Exported functions --------------------------------------------------------*/
+/** @defgroup WWDG_Exported_Functions WWDG Exported Functions
   * @{
   */
 
-/** @defgroup WWDG_Group1 Initialization and de-initialization functions 
+/** @defgroup WWDG_Exported_Functions_Group1 Initialization and de-initialization functions 
  *  @brief    Initialization and Configuration functions. 
  *
 @verbatim    
@@ -150,21 +149,22 @@
   */
 HAL_StatusTypeDef HAL_WWDG_Init(WWDG_HandleTypeDef *hwwdg)
 {
-  uint32_t tmp = 0;
-  
   /* Check the WWDG handle allocation */
   if(hwwdg == NULL)
   {
     return HAL_ERROR;
   }
-  
+
   /* Check the parameters */
+  assert_param(IS_WWDG_ALL_INSTANCE(hwwdg->Instance));
   assert_param(IS_WWDG_PRESCALER(hwwdg->Init.Prescaler));
   assert_param(IS_WWDG_WINDOW(hwwdg->Init.Window)); 
   assert_param(IS_WWDG_COUNTER(hwwdg->Init.Counter)); 
   
   if(hwwdg->State == HAL_WWDG_STATE_RESET)
   {
+    /* Allocate lock resource and initialize it */
+    hwwdg->Lock = HAL_UNLOCKED;
     /* Init the low level hardware */
     HAL_WWDG_MspInit(hwwdg);
   }
@@ -173,31 +173,10 @@ HAL_StatusTypeDef HAL_WWDG_Init(WWDG_HandleTypeDef *hwwdg)
   hwwdg->State = HAL_WWDG_STATE_BUSY;
 
   /* Set WWDG Prescaler and Window */
-  /* Get the CFR register value */
-  tmp = hwwdg->Instance->CFR;
-  
-  /* Clear WDGTB[1:0] and W[6:0] bits */
-  tmp &= ((uint32_t)~(WWDG_CFR_WDGTB | WWDG_CFR_W));
-  
-  /* Prepare the WWDG Prescaler and Window parameters */
-  tmp |= hwwdg->Init.Prescaler | hwwdg->Init.Window;
-  
-  /* Write to WWDG CFR */
-  hwwdg->Instance->CFR = tmp;   
- 
+  MODIFY_REG(hwwdg->Instance->CFR, (WWDG_CFR_WDGTB | WWDG_CFR_W), (hwwdg->Init.Prescaler | hwwdg->Init.Window));
   /* Set WWDG Counter */
-  /* Get the CR register value */
-  tmp = hwwdg->Instance->CR;
-  
-  /* Clear T[6:0] bits */
-  tmp &= ((uint32_t)~(WWDG_CR_T));
-  
-  /* Prepare the WWDG Counter parameter */
-  tmp |= (hwwdg->Init.Counter);  
-  
-  /* Write to WWDG CR */
-  hwwdg->Instance->CR = tmp;  
-   
+  MODIFY_REG(hwwdg->Instance->CR, WWDG_CR_T, hwwdg->Init.Counter);
+
   /* Change WWDG peripheral state */
   hwwdg->State = HAL_WWDG_STATE_READY;
   
@@ -212,7 +191,16 @@ HAL_StatusTypeDef HAL_WWDG_Init(WWDG_HandleTypeDef *hwwdg)
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_WWDG_DeInit(WWDG_HandleTypeDef *hwwdg)
-{   
+{ 
+  /* Check the WWDG handle allocation */
+  if(hwwdg == NULL)
+  {
+    return HAL_ERROR;
+  }
+
+  /* Check the parameters */
+  assert_param(IS_WWDG_ALL_INSTANCE(hwwdg->Instance));
+
   /* Change WWDG peripheral state */  
   hwwdg->State = HAL_WWDG_STATE_BUSY;
   
@@ -268,7 +256,7 @@ __weak void HAL_WWDG_MspDeInit(WWDG_HandleTypeDef *hwwdg)
   * @}
   */
 
-/** @defgroup WWDG_Group2 IO operation functions 
+/** @defgroup WWDG_Exported_Functions_Group2 IO operation functions 
  *  @brief    IO operation functions 
  *
 @verbatim   
@@ -319,19 +307,19 @@ HAL_StatusTypeDef HAL_WWDG_Start(WWDG_HandleTypeDef *hwwdg)
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_WWDG_Start_IT(WWDG_HandleTypeDef *hwwdg)
-{   
+{
   /* Process Locked */
   __HAL_LOCK(hwwdg); 
-  
+
   /* Change WWDG peripheral state */  
   hwwdg->State = HAL_WWDG_STATE_BUSY;
-  
+
   /* Enable the Early Wakeup Interrupt */ 
-  __HAL_WWDG_ENABLE_IT(WWDG_IT_EWI);
+  __HAL_WWDG_ENABLE_IT(hwwdg, WWDG_IT_EWI);
 
   /* Enable the peripheral */
   __HAL_WWDG_ENABLE(hwwdg);  
-  
+
   /* Return function status */
   return HAL_OK;
 }
@@ -340,6 +328,7 @@ HAL_StatusTypeDef HAL_WWDG_Start_IT(WWDG_HandleTypeDef *hwwdg)
   * @brief  Refreshes the WWDG.
   * @param  hwwdg: pointer to a WWDG_HandleTypeDef structure that contains
   *              the configuration information for the specified WWDG module.
+  * @param  Counter: value of counter to put in WWDG counter
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_WWDG_Refresh(WWDG_HandleTypeDef *hwwdg, uint32_t Counter)
@@ -354,7 +343,7 @@ HAL_StatusTypeDef HAL_WWDG_Refresh(WWDG_HandleTypeDef *hwwdg, uint32_t Counter)
   assert_param(IS_WWDG_COUNTER(Counter));
   
   /* Write to WWDG CR the WWDG Counter value to refresh with */
-  MODIFY_REG(hwwdg->Instance->CR, WWDG_CR_T, Counter);
+  MODIFY_REG(hwwdg->Instance->CR, (uint32_t)WWDG_CR_T, Counter);
   
   /* Change WWDG peripheral state */    
   hwwdg->State = HAL_WWDG_STATE_READY; 
@@ -381,20 +370,24 @@ HAL_StatusTypeDef HAL_WWDG_Refresh(WWDG_HandleTypeDef *hwwdg, uint32_t Counter)
   */
 void HAL_WWDG_IRQHandler(WWDG_HandleTypeDef *hwwdg)
 { 
-  /* WWDG Early Wakeup Interrupt occurred */   
-  if(__HAL_WWDG_GET_FLAG(hwwdg, WWDG_FLAG_EWIF) != RESET)
+  /* Check if Early Wakeup Interrupt is enable */
+  if(__HAL_WWDG_GET_IT_SOURCE(hwwdg, WWDG_IT_EWI) != RESET)
   {
-    /* Early Wakeup callback */ 
-    HAL_WWDG_WakeupCallback(hwwdg);
-    
-    /* Change WWDG peripheral state */
-    hwwdg->State = HAL_WWDG_STATE_READY; 
-    
-    /* Clear the WWDG Data Ready flag */
-    __HAL_WWDG_CLEAR_FLAG(hwwdg, WWDG_FLAG_EWIF);
-    
-    /* Process Unlocked */
-    __HAL_UNLOCK(hwwdg);
+    /* Check if WWDG Early Wakeup Interrupt occurred */
+    if(__HAL_WWDG_GET_FLAG(hwwdg, WWDG_FLAG_EWIF) != RESET)
+    {
+      /* Early Wakeup callback */ 
+      HAL_WWDG_WakeupCallback(hwwdg);
+      
+      /* Change WWDG peripheral state */
+      hwwdg->State = HAL_WWDG_STATE_READY; 
+      
+      /* Clear the WWDG Early Wakeup flag */
+      __HAL_WWDG_CLEAR_FLAG(hwwdg, WWDG_FLAG_EWIF);
+      
+      /* Process Unlocked */
+      __HAL_UNLOCK(hwwdg);
+    }
   }
 } 
 
@@ -415,7 +408,7 @@ __weak void HAL_WWDG_WakeupCallback(WWDG_HandleTypeDef* hwwdg)
   * @}
   */
 
-/** @defgroup WWDG_Group3 Peripheral State functions 
+/** @defgroup WWDG_Exported_Functions_Group3 Peripheral State functions 
  *  @brief    Peripheral State functions. 
  *
 @verbatim   
