@@ -1,0 +1,28 @@
+#!/bin/bash
+
+b="\033[1m"
+n="\033[0m"
+
+armsize=$1
+program=$2
+totalflash=$3
+totalram=$4
+
+memorysizes=$($1 $2|tail -1|tr '\t' ' '|tr -s ' '|cut -d' ' -f2,3,4)
+text=$(echo "$memorysizes"|cut -d' ' -f1)
+data=$(echo "$memorysizes"|cut -d' ' -f2)
+bss=$(echo "$memorysizes"|cut -d' ' -f3)
+
+flash=$((text+data))
+ram=$((data+bss))
+
+pflash=$((100*flash/totalflash))
+pram=$((100*ram/totalram))
+
+kflash=$(($flash/1024))
+kram=$(($ram/1024))
+ktotalflash=$(($totalflash/1024))
+ktotalram=$(($totalram/1024))
+
+printf "${b}Flash: %6d bytes (%2d%%)${n}\n" $flash $pflash
+printf "${b}RAM:   %6d bytes (%2d%%)${n}\n" $ram $pram

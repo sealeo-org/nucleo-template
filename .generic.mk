@@ -87,6 +87,7 @@ ifneq ($(OBJS),)
 	@$(LINK) $(OBJS) $(LIBS) -o $@
 	@$(CHOWN) $@
 	@$(ECHO) Linking $@
+	@$(SHOWSIZE)
 endif
 
 $(dir $(PROGRAM)):
@@ -150,7 +151,7 @@ lib: $(DEPS) $(OBJS)
 #-------------------
 
 clean:
-	@$(RM) $(OBJS) $(PROGRAM)
+	@$(RM) $(OBJS) $(PROGRAM) $(PROGRAM:.elf=.bin) $(PROGRAM:.elf=.hex) build/*.a
 
 distclean: clean
 	@$(RM) $(DEPS) $(DEPS:%.d=%.d.*)

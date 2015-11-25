@@ -1,3 +1,7 @@
+# information about Nucleo F401RE
+FLASHSIZE   = 524288
+RAMSIZE     = 98304
+
 PROGRAM = build/nucleo.elf
 
 FLAGS = -D__HEAP_SIZE=0x0000 -D__STACK_SIZE=0x0100 -DSTM32F401RE \
@@ -23,6 +27,8 @@ OBJECT_FILES = mbed/TARGET_NUCLEO_F401RE/TOOLCHAIN_GCC_ARM/*.o
 
 CCOMPILER   = arm-none-eabi-gcc
 CXXCOMPILER = arm-none-eabi-g++
+ARMSIZE     = arm-none-eabi-size
+SHOWSIZE    = ./.memory $(ARMSIZE) $(PROGRAM) $(FLASHSIZE) $(RAMSIZE)
 
 SRCEXTS = .cpp .c .S
 
@@ -37,6 +43,7 @@ include .generic.mk
 ALL_INCLUDES_DIRS += /usr/include/newlib/c++/4.8 /usr/include/newlib/c++/4.8/arm-none-eabi
 
 hex: $(PROGRAM:%.elf=%.hex)
+	@$(SHOWSIZE)
 
 bin: $(PROGRAM:%.elf=%.bin)
 
@@ -53,6 +60,9 @@ bin: $(PROGRAM:%.elf=%.bin)
 flash: $(PROGRAM:%.elf=%.hex)
 	@$(ECHO) Flashing $<
 	@sudo openocd -f .openocd.cfg
+
+memory: $(PROGRAM)
+	@$(SHOWSIZE)
 
 %.o:%.cpp
 	@$(COMPILECPP) $< -o $@
