@@ -16,4 +16,6 @@ cp -rf mbed $dirname
 rm -f $dirname/.generic.mk $dirname/.nucleo.mk $dirname/.memory
 cp .generic.mk .nucleo.mk .memory $dirname
 
+echo "Warning: main makefile not updated! Think about checking out new version"
+
 exit 0
