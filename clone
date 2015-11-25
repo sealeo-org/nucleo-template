@@ -9,7 +9,7 @@ error() {
 [ $(echo $1|cut -c1) = "/" ] && dirname=$1 || dirname=../$1
 
 mkdir $dirname || error "Error: can't create $dirname"
-cp -a . $dirname || error "Error: can't copy files"
+cp -rf . $dirname || error "Error: can't copy files"
 cd $dirname
 rm -rf .git Dockerfile clone README.txt || error "Error: can't clean directory"
 

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+error() {
+    echo>&2 $1
+    exit 1
+}
+
+[ $# -ne 1 ] && error "Usage: $0 dirname";
+[ $(echo $1|cut -c1) = "/" ] && dirname=$1 || dirname=../$1
+[ ! -d $dirname ] && error "$dirname does not exist"
+
+make -C $dirname purge
+rm -rf $dirname/mbed
+cp -rf mbed $dirname
+
+rm -f $dirname/.generic.mk $dirname/.nucleo.mk $dirname/.memory
+cp .generic.mk .nucleo.mk .memory $dirname
+
+exit 0
