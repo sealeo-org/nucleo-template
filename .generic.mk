@@ -190,10 +190,12 @@ help:
 #-------------------------------------
 
 show:
+	@echo -e "INCLUDES_DIRS: $(INCLUDES_DIRS)\n"
 	@echo -e "INCLUDES_DIRS: $(ALL_INCLUDES_DIRS)\n"
 	@echo -e "HEADERS: $(HEADERS)\n"
 	@echo -e "SOURCES: $(SOURCES)\n"
 	@echo -e "PROGRAM: $(PROGRAM)\n"
+	@echo -e "SOURCES_DIRS: $(SOURCES_DIRS)\n"
 	@echo -e "SOURCES_DIRS: $(ALL_SOURCES_DIRS)\n"
 	@echo -e "EXCLUDE_DIRS: $(EXPANDED_EXCLUDE_DIRS)\n"
 	@echo -e "OBJS: $(OBJS)\n"

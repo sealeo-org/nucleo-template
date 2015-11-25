@@ -8,7 +8,9 @@ DEBUGMODE   = 1                 # comment this line to enter in release mode
 LDFLAGS     = -lm
 # Default value: your project directory's name
 LIBNAME     = $(shell basename $(shell pwd))
-LIBOBJ      =
+# List here your sources to add to the library file (e.g.: $(wildcard src/*.cpp))
+LIBSRC      =
+LIBOBJ      = $(LIBSRC:.cpp=.o)
 
 # These variables are not intended to be modified
 PWD         = $(shell pwd)

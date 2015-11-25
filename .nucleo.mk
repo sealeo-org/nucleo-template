@@ -11,6 +11,9 @@ LIBS = -lstdc++ -lm $(LDFLAGS)
 
 MAXDEPTH = 5
 
+SOURCES_DIRS = mbed src
+INCLUDES_DIRS = mbed inc
+
 EXCLUDE_DIRS = mbed/targets/cmsis/TARGET_STM/TARGET_NUCLEO_F401RE/* \
                lib/Emulator lib/Emulator/* tests tests/*
 
