@@ -21,9 +21,9 @@ MEDIA       = /$(shell lsblk|grep $(NUCLEO)|tr -d ' '|cut -d'/' -f2-)
 MEDIAOK     = $(shell [ $(MEDIA) = "/" ] && echo -n "1")
 DOCKERMOUNT = -v $(PWD):$(MOUNTPOINT)
 ifneq ($(DEBUGMODE),)
-DFLAGS      = -O0 -ggdb
+DFLAGS      = -DDEBUG -O0 -ggdb
 else
-DFLAGS      = -O3
+DFLAGS      = -DNDEBUG -Os
 endif
 MAKEARGS    = UID="$(UID)" GID="$(GID)" LDFLAGS="$(LDFLAGS)" DFLAGS="$(DFLAGS)"
 DOCKERMAKE  = make -C$(MOUNTPOINT) $(MAKEARGS) -f.nucleo.mk

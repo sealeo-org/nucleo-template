@@ -11,7 +11,7 @@ FLAGS = -D__HEAP_SIZE=0x0000 -D__STACK_SIZE=0x0100 -DSTM32F401RE \
         -Wl,--gc-sections,--defsym=__HEAP_SIZE=0x0000,--defsym=__STACK_SIZE=0x0100 $(DFLAGS)
 CPPFLAGS = -std=c++11
 
-LIBS = -lstdc++ -lm $(LDFLAGS)
+LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys $(LDFLAGS)
 
 MAXDEPTH = 5
 
