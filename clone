@@ -5,12 +5,14 @@ error() {
     exit 1
 }
 
+rmlist=Dockerfile clone update .git .gdbinit .openocd.cfg st_nucleo_f401re.cfg
+
 [ $# -ne 1 ] && error "Usage: $0 dirname";
 [ $(echo $1|cut -c1) = "/" ] && dirname=$1 || dirname=../$1
 
 mkdir $dirname || error "Error: can't create $dirname"
 cp -rf . $dirname || error "Error: can't copy files"
 cd $dirname
-rm -rf .git Dockerfile clone update README.txt || error "Error: can't clean directory"
+rm -rf $rmlist || error "Error: can't clean directory"
 
 exit 0
