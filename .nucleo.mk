@@ -1,6 +1,7 @@
 # information about Nucleo F401RE
 FLASHSIZE   = 524288
 RAMSIZE     = 98304
+NODEP       = true
 
 PROGRAM = build/nucleo.elf
 
@@ -31,12 +32,17 @@ ARMSIZE     = arm-none-eabi-size
 SHOWSIZE    = ./.memory $(ARMSIZE) $(PROGRAM) $(FLASHSIZE) $(RAMSIZE)
 
 SRCEXTS = .cpp .c .S
-
 HDREXTS = .h
 
-RM = rm -f
+RM = rm -rf
 
 CHOWN = chown $(UID):$(GID)
+CHOWNR= chown -R $(UID):$(GID)
+
+# Generating directory tree for building
+BUILDING_SRC_DIRS =$(shell find mbed -type d -links 2)
+BUILDING_SRC_DIRS+=$(shell find src -type d -links 2)
+BUILDING_DIRS=$(addsuffix /,$(addprefix build/,$(BUILDING_SRC_DIRS)))
 
 include .generic.mk
 
@@ -46,15 +52,14 @@ hex: $(PROGRAM:%.elf=%.hex)
 	@$(SHOWSIZE)
 
 bin: $(PROGRAM:%.elf=%.bin)
+	@$(CHOWNR) build
 
 %.hex: %.elf
 	@arm-none-eabi-objcopy -Oihex $< $@
-	@$(CHOWN) $@
 	@$(ECHO) Generating $@
 
 %.bin: %.elf
 	@arm-none-eabi-objcopy -O binary $< $@
-	@$(CHOWN) $@
 	@$(ECHO) Generating $@
 
 flash: $(PROGRAM:%.elf=%.hex)
@@ -64,7 +69,11 @@ flash: $(PROGRAM:%.elf=%.hex)
 memory: $(PROGRAM)
 	@$(SHOWSIZE)
 
-%.o:%.cpp
+build/%.o:%.cpp
 	@$(COMPILECPP) $< -o $@
-	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
+
+build/%/:
+	@mkdir -p $@
+
+gen_builddirs: $(BUILDING_DIRS)

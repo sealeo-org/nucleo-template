@@ -22,14 +22,6 @@ ifneq ($(MAXDEPTH),)
   MAXDEPTH_OPTION = -maxdepth $(MAXDEPTH)
 endif
 
-ifneq ($(TESTS_DIR),)
-  TESTS_SOURCES_DIRS = $(shell find -L $(wildcard $(TESTS_DIR)) $(MAXDEPTH_OPTION) \
-                                      \( ! -regex '.*/\..*' \) -type d) $(TESTS_DIR)
-  TESTS_SOURCES = $(foreach d, $(TESTS_SOURCES_DIRS), $(wildcard $(addprefix $(d)/*, $(SRCEXTS))))
-  TESTS_OBJS = $(addsuffix .o, $(basename $(TESTS_SOURCES))) $(filter-out %main.o, $(OBJS))
-  TESTS_DEPS = $(TESTS_OBJS:.o=.d)
-endif
-
 EXPANDED_EXCLUDE_DIRS += $(patsubst %/.,%,$(wildcard $(addsuffix /.,$(EXCLUDE_DIRS)))) $(TESTS_SOURCES_DIRS)
 
 ALL_SOURCES_DIRS = $(filter-out $(patsubst ./%, %, $(EXPANDED_EXCLUDE_DIRS)), $(patsubst ./%, %, \
@@ -42,7 +34,7 @@ ALL_INCLUDES_DIRS = $(filter-out $(patsubst ./%, %, $(EXPANDED_EXCLUDE_DIRS)), $
 SOURCES = $(filter-out $(EXCLUDE_FILES), $(foreach d, $(ALL_SOURCES_DIRS), $(wildcard $(addprefix $(d)/*, $(SRCEXTS)))))
 HEADERS = $(filter-out $(EXCLUDE_FILES), $(foreach d, $(ALL_INCLUDES_DIRS), $(wildcard $(addprefix $(d)/*, $(HDREXTS)))))
 INCLUDES = $(patsubst %,-I%,$(ALL_INCLUDES_DIRS))
-SOURCE_OBJS = $(addsuffix .o, $(basename $(SOURCES)))
+SOURCE_OBJS = $(addprefix build/,$(addsuffix .o, $(basename $(SOURCES))))
 OBJS = $(SOURCE_OBJS) $(wildcard $(OBJECT_FILES))
 DEPS = gen_deps $(SOURCE_OBJS:.o=.d)
 
@@ -82,17 +74,12 @@ endif
 all: $(PROGRAM) test
 	@$(ECHO) All done
 
-$(PROGRAM): $(DEPS) $(OBJS) $(dir $(PROGRAM))
+$(PROGRAM): $(BUILDING_DIRS) $(DEPS) $(OBJS)
 ifneq ($(OBJS),)
 	@$(LINK) $(OBJS) $(LIBS) -o $@
-	@$(CHOWN) $@
 	@$(ECHO) Linking $@
 	@$(SHOWSIZE)
 endif
-
-$(dir $(PROGRAM)):
-	@mkdir -p $@
-	@$(CHOWN) $@
 
 test: FORCE $(TESTS_DIR)/tests
 ifneq ($(TESTS_DIR),)
@@ -107,44 +94,37 @@ endif
 gen_deps:
 	@$(ECHO) Updating dependencies
 
-lib: $(DEPS) $(OBJS)
+lib: $(BUILDING_DIRS) $(DEPS) $(OBJS)
 	$(LINK) -shared -o lib$(PROGRAM).so $(OBJS)
-	@$(CHOWN) lib$(PROGRAM).so
 
 #----------------------------------------
 # Rules for generating object files (.o).
 #----------------------------------------
 
-%.o:%.c
+build/%.o:%.c
 	@$(COMPILEC) $< -o $@
-	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
-%.o:%.cpp
+build/%.o:%.cpp
 	@$(COMPILECPP) $< -o $@
-	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
-%.o:%.S
+build/%.o:%.S
 	@$(COMPILECPP) $< -o $@
-	@$(CHOWN) $@
 	@$(ECHO) Compiling $<
 
 #------------------------------------------
 # Rules for creating dependency files (.d).
 #------------------------------------------
 
-%.d:%.c
-	@$(DEPENDC) -MT $(basename $@).o $*.c > $*.d
-	@$(CHOWN) $@
+build/%.d:%.c
+	@$(DEPENDC) -MT $(basename $@).o $*.c > $@
 
-%.d:%.cpp
-	@$(DEPENDCPP) -MT $(basename $@).o $*.cpp > $*.d
-	@$(CHOWN) $@
+build/%.d:%.cpp
+	@$(DEPENDCPP) -MT $(basename $@).o $*.cpp > $@
 
-%.d:%.S
-	@$(DEPENDCPP) -MT $(basename $@).o $*.S > $*.d
-	@$(CHOWN) $@
+build/%.d:%.S
+	@$(DEPENDCPP) -MT $(basename $@).o $*.S > $@
 
 #-------------------
 # Rules for cleaning
@@ -154,7 +134,7 @@ clean:
 	@$(RM) $(OBJS) $(PROGRAM) $(PROGRAM:.elf=.bin) $(PROGRAM:.elf=.hex) build/*.a
 
 distclean: clean
-	@$(RM) $(DEPS) $(DEPS:%.d=%.d.*)
+	@$(RM) $(DEPS) $(DEPS:%.d=%.d.*) build
 
 FORCE:
 
