@@ -10,7 +10,7 @@ LDFLAGS     = -lm
 LIBNAME     = $(shell basename $(shell pwd))
 # List here your sources to add to the library file (e.g.: $(wildcard src/*.cpp))
 LIBSRC      =
-LIBOBJ      = $(LIBSRC:.cpp=.o)
+LIBOBJ      = $(addprefix build/,$(LIBSRC:.cpp=.o))
 
 # These variables are not intended to be modified
 PWD         = $(shell pwd)
