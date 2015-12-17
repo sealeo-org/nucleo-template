@@ -1,5 +1,5 @@
 # These variables are to be modified so it correspond to your system
-IMAGE       = nucleo-testing    # The Docker image name (given at build time by -t)
+IMAGE       = nucleo            # The Docker image name (given at build time by -t)
 NUCLEO      = NODE_F401RE       # The Nucleo directory name when mounted
 DEBUGGER    = gdb               # The debugger to use with make debug
 #DEBUGMODE   = 1                # comment this line to enter in release mode
