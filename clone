@@ -5,7 +5,7 @@ error() {
     exit 1
 }
 
-rmlist=Dockerfile clone update .git .gdbinit .openocd.cfg st_nucleo_f401re.cfg
+rmlist="Dockerfile clone update .git .gdbinit .openocd.cfg st_nucleo_f401re.cfg"
 
 [ $# -ne 1 ] && error "Usage: $0 dirname";
 [ $(echo $1|cut -c1) = "/" ] && dirname=$1 || dirname=../$1
