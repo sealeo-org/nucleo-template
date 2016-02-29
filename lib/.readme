@@ -1,0 +1,4 @@
+This directory is to put all static library files (.a)
+Your output library file, if it exists, will be in build directory
+
+When a file is in this directory, you can add -lNAME in LDLIBS makefile variable

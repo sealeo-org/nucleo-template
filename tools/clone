@@ -1,0 +1,18 @@
+#!/bin/sh
+
+error() {
+    echo>&2 $1
+    exit 1
+}
+
+rmlist="tools Dockerfile clone update .git"
+
+[ $# -ne 1 ] && error "Usage: $0 dirname";
+[ $(echo $1|cut -c1) = "/" ] && dirname=$1 || dirname=../$1
+
+mkdir $dirname || error "Error: can't create $dirname"
+cp -rf . $dirname || error "Error: can't copy files"
+cd $dirname
+rm -rf $rmlist || error "Error: can't clean directory"
+
+exit 0

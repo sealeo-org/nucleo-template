@@ -1,0 +1,4 @@
+This directory is to put all header files of extern libraries
+Your own header files must be set in src!
+
+Any header file in this directory can be included by <>
