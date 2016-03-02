@@ -7,6 +7,10 @@ error() {
 
 uddocker=n
 
+echo -n "Warning: this will erase your projects' Makefile. Continue anyway? [y/N] "
+read ask
+[ "$ask" != y ] && error quit
+
 if [ $# -eq 0 ]; then
     echo -n "Update Docker? [Y/n] "
     read uddocker
@@ -25,12 +29,9 @@ for project in $projects; do
     [ ! -d "$dname" ] && error "Error: project $project not found"
 
     make -C $dname purge
-    rm -rf $dname/mbed
-    cp -rf mbed $dname
-
-    rm -f $dname/.mbed.mk
-    cp .mbed.mk $dname
+    rm -rf $dname/mbed $dname/.*.mk $dname/.memory $dname/[Mm]akefile
+    cp -rf mbed $dname/
+    cp .mbed.mk $dname/
+    cp Makefile $dname/
 done
-
-echo "Warning: main makefile not updated! Think about checking out new version"
 exit 0

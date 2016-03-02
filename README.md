@@ -10,4 +10,7 @@ Should you want to use OpenOCD:
 * ./configure --enable-ftdi --enable-stlink && make && sudo make install
 * sudo cp tools/st_nucleo_f401re.cfg /usr/local/share/openocd/scripts/board/
 
+OR
+* aptitude install openocd
+
 See tools directory
