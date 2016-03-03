@@ -1,0 +1,19 @@
+AR      = @ar rvs
+CHOWN   = @chown
+CHOWNR  = @chown -R
+CP      = @cp -p
+DOCKER  = @docker run
+ECHO    = @echo
+MKDIR   = @mkdir -p
+MOUNT   = @mount
+RM      = rm -rf
+RMDIR   = @rmdir
+SYNC    = @sync
+UMOUNT  = @umount
+
+CC      = $(GCC_BIN)gcc
+CXX     = $(GCC_BIN)g++
+LD      = $(GCC_BIN)gcc
+OBJCOPY = $(GCC_BIN)objcopy
+OBJDUMP = $(GCC_BIN)objdump
+SIZE    = $(GCC_BIN)size

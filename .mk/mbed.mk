@@ -1,35 +1,28 @@
-N_SERIE = $(shell echo $(NUCLEO)|cut -c1-2)
-LDSCRIPT= STM32$(shell echo $(NUCLEO)|cut -c1-4)X$(shell echo $(NUCLEO)|cut -c6)
+include .mk/env.mk
+include .mk/commands.mk
+include .mk/targets.mk
 
-TARGET  = TARGET_NUCLEO_$(NUCLEO)
-TARGET_STM  = TARGET_STM32$(NUCLEO)
-TARGET_STMS = TARGET_STM32$(N_SERIE)
+N_SERIE         = $(shell echo $(NUCLEO)|cut -c1-2)
+LDSCRIPT        = STM32$(shell echo $(NUCLEO)|cut -c1-4)X$(shell echo $(NUCLEO)|cut -c6)
+
+TARGET          = TARGET_NUCLEO_$(NUCLEO)
+TARGET_STM      = TARGET_STM32$(NUCLEO)
+TARGET_STMS     = TARGET_STM32$(N_SERIE)
 TARGET_DIR      = mbed/$(TARGET)
 TARGET_STMDIR   = $(TARGET_DIR)/TARGET_STM
 TARGET_STM32DIR = $(TARGET_STMDIR)/TARGET_STM32$(N_SERIE)
 TARGET_SERIE    = $(TARGET_STM32DIR)/$(TARGET)
 
-MEDIA       = /mnt
+MEDIA           = /mnt
 
-FLASHSIZE   = 0
-RAMSIZE     = 0
-ifeq ($(NUCLEO),F401RE)
-FLASHSIZE   = 524288
-RAMSIZE     = 98304
-endif
-ifeq ($(NUCLEO),F303K8)
-FLASHSIZE   = 65536
-RAMSIZE     = 16384
-endif
-
-GCC_BIN = arm-none-eabi-
-SRC = $(shell find src -name "*.cpp")
-OBJECTS = $(addprefix $(BUILD)/,$(SRC:.cpp=.o))
-SYS_OBJECTS = $(wildcard mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/*.o)
-INCLUDE_PATHS = -Imbed -I$(TARGET_DIR) -I$(TARGET_STMDIR) -I$(TARGET_STM32DIR) -I$(TARGET_SERIE) -Iinc
-LIBRARY_PATHS = -Lmbed/$(TARGET)/TOOLCHAIN_GCC_ARM $(LDFLAGS)
-LIBRARIES = -lmbed $(LDLIBS)
-LINKER_SCRIPT = ./mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/$(LDSCRIPT).ld
+GCC_BIN         = arm-none-eabi-
+SRC             = $(shell find src -name "*.cpp")
+OBJECTS         = $(addprefix $(BUILD)/,$(SRC:.cpp=.o))
+SYS_OBJECTS     = $(wildcard mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/*.o)
+INCLUDE_PATHS   = -Imbed -I$(TARGET_DIR) -I$(TARGET_STMDIR) -I$(TARGET_STM32DIR) -I$(TARGET_SERIE) -Iinc
+LIBRARY_PATHS   = -Lmbed/$(TARGET)/TOOLCHAIN_GCC_ARM $(LDFLAGS)
+LIBRARIES       = -lmbed $(LDLIBS)
+LINKER_SCRIPT   = ./mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/$(LDSCRIPT).ld
 
 BIN = $(BUILD)/$(PROJECT).bin
 HEX = $(BIN:.bin=.hex)
@@ -38,21 +31,9 @@ MAP = $(BIN:.bin=.map)
 LST = $(BIN:.bin=.lst)
 OUTS = $(BIN) $(HEX) $(ELF) $(MAP) $(LST)
 
-############################################################################### 
-CC      = $(GCC_BIN)gcc
-CXX     = $(GCC_BIN)g++
-LD      = $(GCC_BIN)gcc
-OBJCOPY = $(GCC_BIN)objcopy
-OBJDUMP = $(GCC_BIN)objdump
-SIZE    = $(GCC_BIN)size 
-MKDIR	= mkdir -p
-RMDIR   = rmdir
-CHOWN   = chown $(UID):$(GID)
-CHOWNR  = chown -R $(UID):$(GID)
-MOUNT   = mount
-UMOUNT  = umount
-CP      = cp -rf
-SYNC    = sync
+CP      = cp
+CHOWN   += $(UID):$(GID)
+CHOWNR  += $(UID):$(GID)
 
 ifeq ($(HARDFP),1)
 	FLOAT_ABI = hard
@@ -92,7 +73,6 @@ upload: mount flash umount
 mount:
 ifneq ($(MOUNTED),1)
 	$(MOUNT) $(DEVICE) $(MEDIA)
-	ls -lh $(MEDIA)
 endif
 
 umount:
@@ -105,10 +85,7 @@ flash:
 	$(SYNC)
 
 clean:
-	rm -f $(OUTS) $(OBJECTS) $(DEPS)
-
-purge:
-	rm -rf $(BUILD)
+	$(RM) $(OUTS) $(OBJECTS) $(DEPS)
 
 $(BUILD)/%.o: %.S
 	$(MKDIR) $(dir $@)
@@ -134,15 +111,7 @@ $(LST): $(ELF)
 
 lst: $(LST)
 
-SIZEFMT=$(shell $(SIZE) $(ELF)|tail -1|tr -s ' '|cut -d' ' -f2,3,4)
-TEXTSIZE=$(shell echo $(SIZEFMT)|cut -d' ' -f1)
-DATASIZE=$(shell echo $(SIZEFMT)|cut -d' ' -f2)
-BSSSIZE =$(shell echo $(SIZEFMT)|cut -d' ' -f3)
-FLASH=$(shell echo $$(($(TEXTSIZE)+$(DATASIZE))))
-RAM=$(shell echo $$(($(DATASIZE)+$(BSSSIZE))))
-size: $(ELF)
-	@printf "\033[1mFlash: %6d bytes (%2d%%)\033[0m\n" $(FLASH) $$((100*$(FLASH)/$(FLASHSIZE)))
-	@printf "\033[1mRAM:   %6d bytes (%2d%%)\033[0m\n" $(RAM) $$(((100*$(RAM)/$(RAMSIZE))))
+include .mk/size.mk
 
 DEPS = $(OBJECTS:.o=.d) $(SYS_OBJECTS:.o=.d)
 -include $(DEPS)
