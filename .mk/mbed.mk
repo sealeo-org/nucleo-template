@@ -66,8 +66,8 @@ all: own $(BIN) $(HEX) size
 	$(CHOWNR) $(BUILD)
 
 own:
-	$(MKDIR) $(BUILD)
-	$(CHOWNR) $(BUILD)
+	$(MKDIR) $(BUILDDIR)
+	$(CHOWNR) $(BUILDDIR)
 
 upload: mount flash umount
 mount:

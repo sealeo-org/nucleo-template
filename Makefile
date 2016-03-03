@@ -17,7 +17,14 @@ LDLIBS      =
 # -std=gnu++98 -fno-rtti -fno-exceptions
 CFLAGS      = -std=gnu99
 CXXFLAGS    = -std=c++14
-BUILD       = build
+BUILDDIR    = build
+
+ifneq ($(DEBUG),1)
+MODE        = release
+else
+MODE        = debug
+endif
+BUILD       = $(strip $(BUILDDIR)/$(NUCLEO)/$(MODE))
 
 # These variables are to define project's name
 PROJECT     = $(shell basename $(PWD))
@@ -63,3 +70,5 @@ endif
 
 purge:
 	$(RM) $(BUILD)
+purge-all:
+	$(RM) $(BUILDDIR)
