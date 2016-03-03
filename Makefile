@@ -50,7 +50,7 @@ CP          = cp -p
 AR          = @ar rvs
 SYNC        = @sync
 
-.PHONY: all
+.PHONY: all purge
 
 ifeq ($(NUCLEO),)
 nucleo_unspecified:
@@ -74,3 +74,6 @@ endif
 %:
 	$(DOCKER) $@
 endif
+
+purge:
+	rm -rf $(BUILD)
