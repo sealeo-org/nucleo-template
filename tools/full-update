@@ -1,0 +1,50 @@
+#!/bin/sh
+
+error() {
+    echo>&2 $1
+    exit 1
+}
+
+warning() {
+    opt=
+    [ "$1" = '-n' ] && opt='-n' && shift
+    echo $opt '\033[1m\033[33m'$*'\033[0m'
+}
+
+uddocker=n
+
+warning "Warning: this will erase your projects' Makefile."
+warning "It will also try to remove ALL unnecessary files. It can be uncomplete."
+warning "By doing this, there is no warranty your files will be safe"
+warning "Please, make a backup (e.g. git stash) before continuing"
+warning -n "Continue anyway? [y/N] "
+read ask
+[ "$ask" != y ] && error quit
+
+if [ $# -eq 0 ]; then
+    echo -n "Update Docker? [Y/n] "
+    read uddocker
+
+    echo -n "Type a list of projects to update: "
+    read projects
+else
+    projects=$*
+fi
+
+[ "$uddocker" != n ] && docker build --rm -t nucleo .
+
+for project in $projects; do 
+    dname=$project
+    [ ! -d "$project" ] && dname=../$project
+    [ ! -d "$dname" ] && error "Error: project $project not found"
+
+    make -C $dname purge
+    rm -rf $dname/mbed $dname/.gdbinit $dname/.openocd.cfg $dname/st_nucleo_f401re.cfg
+    rm -rf $dname/.*.mk $dname/.memory $dname/[Mm]akefile
+    rm -rf $dname/src/startup_stm32f4xx.S $dname/src/stm32f401re_flash.ld $dname/src/stm32f401re_sram.ld $dname/src/system_stm32f4xx
+    rm -rf $dname/inc/stm32f4xx.h $dname/inc/system_stm32f4xx.h $dname/inc/stm32f401re_flash.ld $dname/inc/stm32f401re_sram.ld $dname/inc/system_stm32f4xx
+    cp -rf mbed $dname/
+    cp .mbed.mk $dname/
+    cp Makefile $dname/
+done
+exit 0

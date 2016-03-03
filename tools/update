@@ -1,0 +1,36 @@
+#!/bin/sh
+
+error() {
+    echo>&2 $1
+    exit 1
+}
+
+uddocker=n
+
+if [ $# -eq 0 ]; then
+    echo -n "Update Docker? [Y/n] "
+    read uddocker
+
+    echo -n "Type a list of projects to update: "
+    read projects
+else
+    projects=$*
+fi
+
+[ "$uddocker" != n ] && docker build --rm -t nucleo .
+
+for project in $projects; do 
+    dname=$project
+    [ ! -d "$project" ] && dname=../$project
+    [ ! -d "$dname" ] && error "Error: project $project not found"
+
+    make -C $dname purge
+    rm -rf $dname/mbed
+    cp -rf mbed $dname
+
+    rm -f $dname/.mbed.mk
+    cp .mbed.mk $dname
+done
+
+echo "Warning: main makefile not updated! Think about checking out new version"
+exit 0

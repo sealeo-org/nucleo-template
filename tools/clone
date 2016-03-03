@@ -1,0 +1,22 @@
+#!/bin/sh
+
+error() {
+    echo>&2 $1
+    exit 1
+}
+
+rmlist="tools Dockerfile clone update .git"
+
+[ $# -ne 1 ] && error "Usage: $0 ProjectName\nUsage: $0 ProjectDirectory";
+_dname=$1
+[ $(echo $1|tr -dc /|wc -c) -eq 0 ] && _dname=../$1
+dname=$(realpath $_dname)
+[ -d "$dname" ] && error "Error: directory $dname already exists"
+
+mkdir -p $dname || error "Error: cannot create $dname"
+cp -rf . $dname || error "Error: cannot copy files"
+cd $dname       || error "Error: cannot go to $dname"
+rm -rf $rmlist  || error "Error: cannot clean directory"
+echo "Info: project created in $dname"
+
+exit 0
