@@ -9,6 +9,8 @@ TARGET_STMDIR   = $(TARGET_DIR)/TARGET_STM
 TARGET_STM32DIR = $(TARGET_STMDIR)/TARGET_STM32$(N_SERIE)
 TARGET_SERIE    = $(TARGET_STM32DIR)/$(TARGET)
 
+MEDIA       = /mnt
+
 FLASHSIZE   = 0
 RAMSIZE     = 0
 ifeq ($(NUCLEO),F401RE)
@@ -21,16 +23,15 @@ RAMSIZE     = 16384
 endif
 
 GCC_BIN = arm-none-eabi-
-BUILDDIR = build
 SRC = $(shell find src -name "*.cpp")
-OBJECTS = $(addprefix $(BUILDDIR)/,$(SRC:.cpp=.o))
+OBJECTS = $(addprefix $(BUILD)/,$(SRC:.cpp=.o))
 SYS_OBJECTS = $(wildcard mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/*.o)
 INCLUDE_PATHS = -Imbed -I$(TARGET_DIR) -I$(TARGET_STMDIR) -I$(TARGET_STM32DIR) -I$(TARGET_SERIE) -Iinc
 LIBRARY_PATHS = -Lmbed/$(TARGET)/TOOLCHAIN_GCC_ARM $(LDFLAGS)
 LIBRARIES = -lmbed $(LDLIBS)
 LINKER_SCRIPT = ./mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/$(LDSCRIPT).ld
 
-BIN = $(BUILDDIR)/$(PROJECT).bin
+BIN = $(BUILD)/$(PROJECT).bin
 HEX = $(BIN:.bin=.hex)
 ELF = $(BIN:.bin=.elf)
 MAP = $(BIN:.bin=.map)
@@ -44,9 +45,14 @@ LD      = $(GCC_BIN)gcc
 OBJCOPY = $(GCC_BIN)objcopy
 OBJDUMP = $(GCC_BIN)objdump
 SIZE    = $(GCC_BIN)size 
-MKDIR	= @mkdir -p
-CHOWN   = @chown $(UID):$(GID)
-CHOWNR  = @chown -R $(UID):$(GID)
+MKDIR	= mkdir -p
+RMDIR   = rmdir
+CHOWN   = chown $(UID):$(GID)
+CHOWNR  = chown -R $(UID):$(GID)
+MOUNT   = mount
+UMOUNT  = umount
+CP      = cp -rf
+SYNC    = sync
 
 ifeq ($(HARDFP),1)
 	FLOAT_ABI = hard
@@ -73,28 +79,44 @@ MORE_CXXFLAGS=-std=gnu++98 -fno-rtti -fno-exceptions
 CFLAGS=$(CC_FLAGS) $(MORE_CFLAGS)
 CXXFLAGS=$(CC_FLAGS) $(MORE_CXXFLAGS)
 
-.PHONY: all clean lst size own
+.PHONY: all clean lst size own remount upload flash
 
 all: own $(BIN) $(HEX) size
-	$(CHOWNR) $(BUILDDIR)
+	$(CHOWNR) $(BUILD)
 
 own:
-	$(MKDIR) build
-	$(CHOWNR) $(BUILDDIR)
+	$(MKDIR) $(BUILD)
+	$(CHOWNR) $(BUILD)
+
+upload: mount flash umount
+mount:
+ifneq ($(MOUNTED),1)
+	$(MOUNT) $(DEVICE) $(MEDIA)
+	ls -lh $(MEDIA)
+endif
+
+umount:
+ifneq ($(MOUNTED),1)
+	$(UMOUNT) $(MEDIA)
+endif
+
+flash:
+	$(CP) $(BINARY) $(MEDIA)
+	$(SYNC)
 
 clean:
 	rm -f $(OUTS) $(OBJECTS) $(DEPS)
 
 purge:
-	rm -rf $(BUILDDIR)
+	rm -rf $(BUILD)
 
-$(BUILDDIR)/%.o: %.S
+$(BUILD)/%.o: %.S
 	$(MKDIR) $(dir $@)
 	$(CC) $(CPU) -c -x assembler-with-cpp -o$@ $<
-$(BUILDDIR)/%.o: %.c
+$(BUILD)/%.o: %.c
 	$(MKDIR) $(dir $@)
 	$(CC) $(CFLAGS) $(CC_SYMBOLS) $(INCLUDE_PATHS) -o$@ $<
-$(BUILDDIR)/%.o: %.cpp
+$(BUILD)/%.o: %.cpp
 	$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(CC_SYMBOLS) $(INCLUDE_PATHS) -o$@ $<
 
