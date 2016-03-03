@@ -19,13 +19,6 @@ CFLAGS      = -std=gnu99
 CXXFLAGS    = -std=c++14
 BUILDDIR    = build
 
-ifneq ($(DEBUG),1)
-MODE        = release
-else
-MODE        = debug
-endif
-BUILD       = $(strip $(BUILDDIR)/$(NUCLEO)/$(MODE))
-
 # These variables are to define project's name
 PROJECT     = $(shell basename $(PWD))
 
@@ -33,23 +26,31 @@ PROJECT     = $(shell basename $(PWD))
 LIBNAME     = $(PROJECT)
 # List here your sources to add to the library file (e.g.: $(wildcard src/*.cpp) or $(shell find src -name '*.cpp'))
 LIBSRC      =
+
+# == Build directory == #
+ifneq ($(DEBUG),1)
+MODE        = release
+else
+MODE        = debug
+endif
+BUILD       = $(strip $(BUILDDIR)/$(NUCLEO)/$(MODE))
+# ==                 == #
+
 LIBOBJ      = $(addprefix $(BUILD)/,$(LIBSRC:.cpp=.o))
 
 include .mk/vars.mk
 include .mk/targets.mk
-.PHONY: all purge
+.PHONY: all purge purge-all
 
 ifeq ($(NUCLEO),)
-nucleo_unspecified:
-	$(ECHO) "Error: you must specify a value for NUCLEO. See Makefile"
 all: nucleo_unspecified
 upload: nucleo_unspecified
-else
-ifeq ($(VALID_TARGET),0)
-invalid_target:
-	$(ECHO) "Error: invalid target $(NUCLEO)"
+else ifeq ($(VALID_TARGET),0)
 all: invalid_target
 upload: invalid_target
+else ifeq ($(VALID_DEVICE),0)
+all: invalid_device
+upload: invalid_device
 else
 all:
 	$(DOCKERRUN)
@@ -66,9 +67,16 @@ endif
 %:
 	$(DOCKERRUN) $@
 endif
-endif
 
 purge:
 	$(RM) $(BUILD)
 purge-all:
 	$(RM) $(BUILDDIR)
+
+# Error cases
+nucleo_unspecified:
+	$(ECHO) "Error: you must specify a value for NUCLEO. See Makefile"
+invalid_target:
+	$(ECHO) "Error: invalid target $(NUCLEO)"
+invalid_device:
+	$(ECHO) "Error: is the nucleo $(NUCLEO) plugged-in?"
