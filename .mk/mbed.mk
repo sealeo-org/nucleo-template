@@ -69,7 +69,7 @@ own:
 	$(MKDIR) $(BUILDDIR)
 	$(CHOWNR) $(BUILDDIR)
 
-upload: mount flash umount
+upload: all mount flash umount
 mount:
 ifneq ($(MOUNTED),1)
 	$(MOUNT) $(DEVICE) $(MEDIA)

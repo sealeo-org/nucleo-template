@@ -42,30 +42,29 @@ include .mk/vars.mk
 include .mk/targets.mk
 .PHONY: all purge purge-all
 
-ifeq ($(NUCLEO),)
+ifeq ($(NUCLEO),)               # > Check if nucleo is set
 all: nucleo_unspecified
 upload: nucleo_unspecified
-else ifeq ($(VALID_TARGET),0)
+else ifneq ($(VALID_TARGET),1)  # > Check if nucleo is valid
 all: invalid_target
 upload: invalid_target
-else ifeq ($(VALID_DEVICE),0)
-all: invalid_device
-upload: invalid_device
-else
+else                            # > Nucleo set and valid
 all:
 	$(DOCKERRUN)
 ifneq ($(LIBOBJ),)
 	$(AR) $(BUILD)/lib$(LIBNAME).a $(LIBOBJ)
 endif
 
-ifeq ($(MOUNTED),1)
+ifneq ($(VALID_DEVICE),1)       # >> Check if device found for upload
+upload: invalid_device
+else ifeq ($(MOUNTED),1)        # >> Check if device already mounted
 upload: all
 	$(CP) $(BINARY) $(MEDIA)
 	$(SYNC)
-endif
-
+else
 %:
 	$(DOCKERRUN) $@
+endif
 endif
 
 purge:
