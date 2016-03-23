@@ -29,7 +29,7 @@ for project in $projects; do
     cp -rf mbed $dname
 
     rm -f $dname/.mbed.mk
-    cp .mbed.mk $dname
+    cp -rf .mk $dname
 done
 
 echo "Warning: main makefile not updated! Think about checking out new version"
