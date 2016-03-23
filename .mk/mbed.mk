@@ -19,7 +19,7 @@ GCC_BIN         = arm-none-eabi-
 SRC             = $(shell find src -name "*.cpp")
 OBJECTS         = $(addprefix $(BUILD)/,$(SRC:.cpp=.o))
 SYS_OBJECTS     = $(wildcard mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/*.o)
-INCLUDE_PATHS   = -Imbed -I$(TARGET_DIR) -I$(TARGET_STMDIR) -I$(TARGET_STM32DIR) -I$(TARGET_SERIE) -Iinc
+INCLUDE_PATHS   = -Imbed -I$(TARGET_DIR) -I$(TARGET_STMDIR) -I$(TARGET_STM32DIR) -I$(TARGET_SERIE) $(INCLUDES)
 LIBRARY_PATHS   = -Lmbed/$(TARGET)/TOOLCHAIN_GCC_ARM $(LDFLAGS)
 LIBRARIES       = -lmbed $(LDLIBS)
 LINKER_SCRIPT   = ./mbed/$(TARGET)/TOOLCHAIN_GCC_ARM/$(LDSCRIPT).ld
@@ -98,7 +98,7 @@ $(BUILD)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(CC_SYMBOLS) $(INCLUDE_PATHS) -o$@ $<
 
 $(ELF): $(OBJECTS) $(SYS_OBJECTS)
-	$(LD) $(LD_FLAGS) -T$(LINKER_SCRIPT) $(LIBRARY_PATHS) -o $@ $^ $(LIBRARIES) $(LD_SYS_LIBS) $(LIBRARIES) $(LD_SYS_LIBS)
+	$(LD) $(LD_FLAGS) -T$(LINKER_SCRIPT) $(LIBRARY_PATHS) -o $@ $^ $(LIBRARIES) $(LD_SYS_LIBS)
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@

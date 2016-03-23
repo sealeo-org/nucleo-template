@@ -15,6 +15,7 @@ LDLIBS      =
 
 # if CXXFLAGS is not set in this file, default is:
 # -std=gnu++98 -fno-rtti -fno-exceptions
+INCLUDES    = -Iinc
 CFLAGS      = -std=gnu99
 CXXFLAGS    = -std=c++14
 BUILDDIR    = build
