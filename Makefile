@@ -11,7 +11,7 @@ DEBUG   = 0                     # 0: release, 1: debug
 
 # These variables are to use or deploy libraries, LDFLAGS for -L flags, LDLIBS for -l flags
 LDFLAGS     = -Llib 
-LDLIBS      = 
+LDLIBS      = -lgcc
 
 # if CXXFLAGS is not set in this file, default is:
 # -std=gnu++98 -fno-rtti -fno-exceptions

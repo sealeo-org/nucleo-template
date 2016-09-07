@@ -46,7 +46,7 @@ CC_FLAGS = $(CPU) -c -fno-common -fmessage-length=0 -Wall -Wextra -ffunction-sec
 CC_SYMBOLS = -D$(TARGET_STM) -DTARGET_FF_ARDUINO -DTOOLCHAIN_GCC_ARM -DTOOLCHAIN_GCC -DTARGET_FF_MORPHO -DTARGET_CORTEX_M -D__FPU_PRESENT=1 -D__MBED__=1 -D$(TARGET) -DTARGET_M4 -DTARGET_STM -DMBED_BUILD_TIMESTAMP=1449154184.9 -DTARGET_STM32$(N_SERIE) -D__CORTEX_M4 -DARM_MATH_CM4 
 
 LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs -u _printf_float -u _scanf_float -Wl,--wrap,main -Wl,-Map=$(MAP),--cref
-LD_SYS_LIBS = -lstdc++ -lsupc++ -lc -lgcc -lnosys
+LD_SYS_LIBS = -lgcc -lstdc++ -lsupc++ -lc -lnosys
 
 ifeq ($(DEBUG), 1)
   CC_FLAGS += -DDEBUG -O0 -g -ggdb
