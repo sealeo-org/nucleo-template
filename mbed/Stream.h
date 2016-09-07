@@ -18,6 +18,7 @@
 
 #include "platform.h"
 #include "FileLike.h"
+#include <cstdarg>
 
 namespace mbed {
 
@@ -25,6 +26,10 @@ extern void mbed_set_unbuffered_stream(FILE *_file);
 extern int mbed_getc(FILE *_file);
 extern char* mbed_gets(char *s, int size, FILE *_file);
 
+/** File stream
+ *
+ * @Note Synchronization level: Set by subclass
+ */
 class Stream : public FileLike {
 
 public:
@@ -37,6 +42,8 @@ public:
     char *gets(char *s, int size);
     int printf(const char* format, ...);
     int scanf(const char* format, ...);
+    int vprintf(const char* format, std::va_list args);
+    int vscanf(const char* format, std::va_list args);
 
     operator std::FILE*() {return _file;}
 
