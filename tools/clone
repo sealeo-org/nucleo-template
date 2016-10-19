@@ -10,7 +10,7 @@ rmlist="tools Dockerfile clone update .git"
 [ $# -ne 1 ] && error "Usage: $0 ProjectName\nUsage: $0 ProjectDirectory";
 _dname=$1
 [ $(echo $1|tr -dc /|wc -c) -eq 0 ] && _dname=../$1
-dname=$(realpath $_dname)
+dname=$(readlink -f $_dname)
 [ -d "$dname" ] && error "Error: directory $dname already exists"
 
 mkdir -p $dname || error "Error: cannot create $dname"
