@@ -4,7 +4,8 @@ BINARY      = $(BUILD)/$(PROJECT).bin
 IMAGE       = nucleo            # The Docker image name (given at build time by -t)
 
 MOUNTPOINT  = /firmware
-DEVICE      ?= $(shell realpath $(DDBLDIR)/$$(file /dev/disk/by-label/*|grep $(TARGET)|tr -s ' '|cut -d' ' -f5))
+DEVICELN    = $(shell find /dev/disk/by-label/ -name $(TARGET))
+DEVICE      ?= $(shell readlink -f $(DEVICELN))
 MOUNTED     = $(shell mount|grep -q $(TARGET)&&echo -n "1"||echo -n '0')
 MEDIA       = $(shell mount|grep $(TARGET)|tr -s ' '|cut -d' ' -f3)
 ifneq ($(MOUNTED),1)
