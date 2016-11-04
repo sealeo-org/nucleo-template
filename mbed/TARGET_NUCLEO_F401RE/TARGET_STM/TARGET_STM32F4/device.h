@@ -1,6 +1,8 @@
+// The 'features' section in 'target.json' is now used to create the device's hardware preprocessor switches.
+// Check the 'features' section of the target description in 'targets.json' for more details.
 /* mbed Microcontroller Library
  *******************************************************************************
- * Copyright (c) 2016, STMicroelectronics
+ * Copyright (c) 2014, STMicroelectronics
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,82 +29,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************
  */
-#ifndef MBED_COMMON_OBJECTS_H
-#define MBED_COMMON_OBJECTS_H
+#ifndef MBED_DEVICE_H
+#define MBED_DEVICE_H
 
-#include "cmsis.h"
-#include "PortNames.h"
-#include "PeripheralNames.h"
-#include "PinNames.h"
+//=======================================
+#define DEVICE_ID_LENGTH       24
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct pwmout_s {
-    PWMName pwm;
-    PinName pin;
-    uint32_t prescaler;
-    uint32_t period;
-    uint32_t pulse;
-    uint8_t channel;
-    uint8_t inverted;
-};
-
-struct serial_s {
-    UARTName uart;
-    int index;
-    uint32_t baudrate;
-    uint32_t databits;
-    uint32_t stopbits;
-    uint32_t parity;
-    PinName pin_tx;
-    PinName pin_rx;
-#if DEVICE_SERIAL_ASYNCH
-    uint32_t events;
-#endif
-#if DEVICE_SERIAL_FC
-    uint32_t hw_flow_ctl;
-    PinName pin_rts;
-    PinName pin_cts;
-#endif
-};
-
-struct spi_s {
-    SPI_HandleTypeDef handle;
-    IRQn_Type spiIRQ;
-    SPIName spi;
-    PinName pin_miso;
-    PinName pin_mosi;
-    PinName pin_sclk;
-    PinName pin_ssel;
-#ifdef DEVICE_SPI_ASYNCH
-    uint32_t event;
-    uint8_t module;
-    uint8_t transfer_type;
-#endif
-};
-
-struct i2c_s {
-    I2CName  i2c;
-    I2C_HandleTypeDef handle;
-    IRQn_Type event_i2cIRQ;
-    IRQn_Type error_i2cIRQ;
-    uint8_t slave;
-#if DEVICE_I2C_ASYNCH
-    uint32_t address;
-    uint8_t event;
-    uint8_t stop;
-    uint8_t available_events;
-    uint8_t XferOperation;
-#endif
-};
-
-#include "gpio_object.h"
-
-#ifdef __cplusplus
-}
-#endif
+#include "objects.h"
 
 #endif
-
