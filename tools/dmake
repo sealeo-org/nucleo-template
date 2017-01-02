@@ -1,0 +1,8 @@
+#!/bin/bash
+# Configuration
+## Docker image
+image=nucleo
+## Project name
+projectname=$(basename $(pwd))
+
+docker run --rm --privileged -v /etc/passwd:/etc/passwd:ro -v /dev:/dev -v $(pwd):/mnt/$projectname $image /bin/bash -c "cd /mnt/$projectname; make $@; chown 2>/dev/null -R $USER: build"

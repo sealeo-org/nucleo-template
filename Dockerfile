@@ -1,7 +1,9 @@
-FROM debian:8.2
-MAINTAINER Alexis Pereda
+FROM nfnty/arch-mini:latest
+MAINTAINER Alexis Pereda <alexis@pereda.fr>
 
-RUN echo "deb http://http.debian.net/debian jessie-backports main">/etc/apt/sources.list.d/backports.list
-RUN apt-get update&&apt-get upgrade -y&&apt-get install -tjessie-backports -y build-essential gcc-arm-none-eabi&&rm -rf /var/lib/apt/lists/*
+RUN pacman --noconfirm -Sy archlinux-keyring
+RUN pacman --noconfirm -Syu
+RUN pacman --noconfirm -S arm-none-eabi-gcc arm-none-eabi-newlib make cmake
+RUN pacman --noconfirm -S util-linux
 
 # Build with 'docker build --rm -t nucleo .'

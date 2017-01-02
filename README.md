@@ -1,8 +1,9 @@
 Installation
-Using nucleo-template:
+Using nucleo-template with docker:
 * install Docker
 * docker build -t nucleo .
 * tools/clone NAME # this will create a project in the parent directory
+* tools/dmake must be used instead of make
 
 Should you want to use OpenOCD:
 * wget http://ufpr.dl.sourceforge.net/project/openocd/openocd/0.9.0/openocd-0.9.0.tar.bz2 -Oopenocd-0.9.0.tar.bz2

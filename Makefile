@@ -1,6 +1,7 @@
 # == NUCLEO == #
-NUCLEO      := F303K8
-TARGET      := NODE_$(NUCLEO)
+NUCLEO      := F401RE
+DISKDIR			:= /dev/disk/by-label
+LABEL				:= NODE_$(NUCLEO)
 # ==        == #
 # == Configuration == #
 UD_SRC      :=
@@ -86,28 +87,75 @@ endif
 # ==              == #
 
 # == Globals == #
-ECHO    = @echo
-MKDIR   = @mkdir -p
-RM      = @rm -rf
-AR      = @ar rvs
-CP      = @cp -rf
+ECHO			:= @echo -e
+MKDIR			:= @mkdir -p
+RM				:= @rm -rf
+AR				:= @ar rvs
+CP				:= @cp -rf
+SYNC			:= @sync
+MOUNT			:= @mount
+UMOUNT		:= @umount
 
-RED     = \e[1;31m
-GREEN   = \e[1;32m
-BLUE    = \e[1;34m
-YELLOW  = \e[1;33m
-NOCOLOR = \e[0m
+RED				:= \e[1;31m
+GREEN			:= \e[1;32m
+BLUE			:= \e[1;34m
+YELLOW		:= \e[1;33m
+NOCOLOR		:= \e[0m
 # ==         == #
 
 # == Rules == #
-.PHONY: all bin hex lst lib lib clean purge purge-all
+.PHONY: all bin hex lst lib upload clean purge purge-all
 
+ifeq ($(NUCLEO),)
+all: nucleo_unspecified
+upload: nucleo_unspecified
+else
+ifneq ($(VALID_TARGET),1)
+all: invalid_target
+upload: invalid_target
+else
 all: $(OUTLIST)
 bin: $(BIN)
 hex: $(HEX)
 lst: $(LST)
 lib: $(LIBOUT)
 
+DEVICE		= $(shell readlink -f $(DISKDIR)/$(LABEL))
+
+ifeq ($(DEVICE),)
+upload: invalid_device
+	readlink -f $(DISKDIR)/$(LABEL)
+else
+MOUNTED		= $(shell mount|grep -q $(DEVICE) && echo 1 || echo 0)
+MOUNTPOINT= $(shell findmnt -cfno target $(DEVICE))
+
+ifeq ($(MOUNTPOINT),)
+ifeq ($(shell id -u),0)
+upload:
+	$(MOUNT) $(DEVICE) /mnt
+	$(CP) $(BIN) /mnt
+	$(SYNC)
+	$(UMOUNT) /mnt
+else
+upload:	nucleo_not_mounted
+endif	# USER
+else
+upload: all
+	$(CP) $(BIN) $(MOUNTPOINT)
+	$(SYNC)
+endif	# MOUNTED
+endif	# VALID DEVICE
+
+endif	# VALID TARGET
+endif # NUCLEO
+nucleo_unspecified:
+	$(ECHO) "$(RED)Error: you must specify a value for NUCLEO. See Makefile$(NOCOLOR)"
+invalid_target:
+	$(ECHO) "$(RED)Error: invalid target $(NUCLEO)$(NOCOLOR)"
+invalid_device:
+	$(ECHO) "$(RED)Error: is the nucleo $(NUCLEO) plugged-in?$(NOCOLOR)"
+nucleo_not_mounted:
+	$(ECHO) "$(RED)Error: $(NUCLEO) not mounted$(NOCOLOR)"
 # ==== Cleanup rules ==== #
 clean:
 	$(RM) $(OBJECTS)
