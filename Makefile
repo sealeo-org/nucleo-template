@@ -1,5 +1,5 @@
 # == NUCLEO == #
-NUCLEO      := F401RE
+NUCLEO      := 
 DISKDIR			:= /dev/disk/by-label
 LABEL				:= NODE_$(NUCLEO)
 # ==        == #
@@ -12,7 +12,7 @@ UD_LDLIBS   :=
 UD_INCLUDES :=
 
 DEBUG       := 0
-CPP_VERSION	:= c++14
+CPP_VERSION	:= c++11
 # ==							 == #
 # == Directories == #
 SRCDIR      := src
@@ -46,7 +46,7 @@ CXX         := arm-none-eabi-g++
 OBJCOPY     := arm-none-eabi-objcopy
 OBJDUMP     := arm-none-eabi-objdump
 CXXWARNFLAGS:= -Wall -Wextra -pedantic -ansi
-CXXFLAGS    := $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) $(CXXWARNFLAGS) -MMD -fdiagnostics-color=always -std=$(CPP_VERSION)
+CXXFLAGS    := $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) $(CXXWARNFLAGS) -MMD -std=$(CPP_VERSION)
 LDFLAGS     := $(MBED_LDFLAGS) $(MBED_CPU) $(_LDFLAGS)
 LDLIBS      := $(MBED_LDSYSLIBS) $(_LDLIBS)
 INCLUDES    := $(MBED_INCLUDES) $(UD_INCLUDES)
@@ -55,14 +55,23 @@ INCLUDES    := $(MBED_INCLUDES) $(UD_INCLUDES)
 SRC         := $(wildcard $(SRCDIR)/*.cpp) $(UD_SRC)
 LIBSRC      := $(UD_LIBSRC)
 # ==         == #
+ifeq ($(CXXMAJOR),$(filter $(CXXMAJOR),5 6 7))
+  CXXFLAGS  += -fdiagnostics-color=always
+else
+  ifeq ($(CXXMAJOR),$(filter $(CXXMAJOR),4))
+    ifeq ($(CXXMINOR),$(filter $(CXXMINOR),9))
+      CXXFLAGS += -fdiagnostics-color=always
+    endif
+  endif
+endif
 
 # == Build directory == #
 ifneq ($(DEBUG),1)
-MODE        := release
-CXXFLAGS   += -DNDEBUG -Os
+  MODE        := release
+  CXXFLAGS		+= -DNDEBUG -Os
 else
-MODE        := debug
-CXXFLAGS   += -DDEBUG -O0
+  MODE        := debug
+  CXXFLAGS		+= -DDEBUG -O0
 endif
 BUILD       := $(strip $(BUILDDIR)/$(NUCLEO)/$(MODE))
 # ==                 == #
@@ -79,10 +88,10 @@ LIBOUT      := $(BUILD)/lib$(shell basename $$(pwd)).a
 
 OUTLIST     =
 ifneq ($(OBJECTS),)
-OUTLIST    += bin hex lst
+  OUTLIST    += bin hex lst
 endif
 ifneq ($(LIBOBJS),)
-OUTLIST    += lib
+  OUTLIST    += lib
 endif
 # ==              == #
 
