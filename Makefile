@@ -1,68 +1,80 @@
--include .mbed.mk
 # == NUCLEO == #
-NUCLEO      = F401RE
-TARGET      = NODE_$(NUCLEO)
-# ==        == #
-# == Inputs == #
-UD_SRC      =
-UD_LIBSRC   =
-UD_TESTSRC  =
-UD_LDFLAGS  =
-UD_LDLIBS   =
-UD_INCLUDES =
+NUCLEO      := F303K8
+TARGET      := NODE_$(NUCLEO)
 # ==        == #
 # == Configuration == #
-SRCDIR      = src
-BUILDDIR    = build
-TESTDIR     = tests
+UD_SRC      :=
+UD_LIBSRC   :=
+UD_TESTSRC  :=
+UD_LDFLAGS  :=
+UD_LDLIBS   :=
+UD_INCLUDES :=
 
-DEBUG       = 0
+DEBUG       := 0
+CPP_VERSION	:= c++14
+# ==							 == #
+# == Directories == #
+SRCDIR      := src
+BUILDDIR    := build
 # ==               == #
+-include .targets.mk
+# == MBED ==#
+MBED_CPU				:= -mcpu=cortex-m$(CORTEXM) -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+MBED_CXXFLAGS		:= -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer
+
+TARGET_NAME			:= TARGET_NUCLEO_$(NUCLEO)
+TARGET_ID				:= TARGET_STM32F$(NUCLEO_ID)
+
+NUCLEO_TARGET		:= mbed/$(TARGET_NAME)
+NUCLEO_STM			:= $(NUCLEO_TARGET)/TARGET_STM
+NUCLEO_STM_ID		:= $(NUCLEO_STM)/$(TARGET_ID)
+
+MBED_NUCLEO_INC	:= -I$(NUCLEO_TARGET) -I$(NUCLEO_STM) -I$(NUCLEO_STM_ID) -I$(NUCLEO_STM_ID)/$(TARGET_NAME) -I$(NUCLEO_STM_ID)/$(TARGET_NAME)/device -I$(NUCLEO_STM_ID)/device -I$(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM
+MBED_INCLUDES		:= -Imbed -Imbed/drivers -Imbed/hal -Imbed/platform $(MBED_NUCLEO_INC)
+
+MBED_CXXDEFINES := -D__MBED__=1 -D$(TARGET_ID) -DTARGET_LIKE_MBED -D$(TARGET_NAME) -DTARGET_RTOS_M4_M7 -DDEVICE_RTC=1 -DTOOLCHAIN_object -DDEVICE_SERIAL_ASYNCH=1 -DMBED_BUILD_TIMESTAMP=1476920540.02 -D__CMSIS_RTOS -DTOOLCHAIN_GCC -DTARGET_CORTEX_M -DTARGET_LIKE_CORTEX_M$(CORTEXM) -DTARGET_M$(CORTEXM) -DTARGET_UVISOR_UNSUPPORTED -DDEVICE_SERIAL=1 -DDEVICE_INTERRUPTIN=1 -DDEVICE_I2C=1 -DDEVICE_PORTOUT=1 -DDEVICE_I2CSLAVE=1 -D__CORTEX_M$(CORTEXM) -DDEVICE_STDIO_MESSAGES=1 -DTARGET_STM32$(NUCLEO) -DTARGET_FF_MORPHO -D__FPU_PRESENT=1 -DTARGET_FF_ARDUINO -DDEVICE_PORTIN=1 -DTARGET_RELEASE -DTARGET_STM -DDEVICE_SERIAL_FC=1 -DDEVICE_PORTINOUT=1 -D__MBED_CMSIS_RTOS_CM -DDEVICE_SLEEP=1 -DTOOLCHAIN_GCC_ARM -DDEVICE_SPI=1 -DDEVICE_ERROR_RED=1 -DDEVICE_SPISLAVE=1 -DDEVICE_ANALOGIN=1 -DDEVICE_PWMOUT=1 -DARM_MATH_CM4 -include mbed/mbed_config.h
+
+MBED_LDFLAGS		:= -Wl,--gc-sections -Wl,--wrap,main -L$(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM
+MBED_LDSYSLIBS	:= -lstdc++ -lsupc++ -lc -lgcc -lnosys -lmbed
+
+MBED_OBJECTS		:= $(shell find $(NUCLEO_TARGET) -name '*.o')
+LINKER_SCRIPT		:= $(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM/$(LDFILE)
+# ==      == #
 # == Compiler == #
-CXX         = arm-none-eabi-g++
-OBJCOPY     = arm-none-eabi-objcopy
-OBJDUMP     = arm-none-eabi-objdump
-CXXFLAGS    = $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) -MMD -W -Wall -Wextra -pedantic -ansi -std=c++14
-LDFLAGS     = $(MBED_LDFLAGS) $(MBED_CPU) $(_LDFLAGS)
-LDLIBS      = $(MBED_LDSYSLIBS) $(_LDLIBS)
-INCLUDES    = $(MBED_INCLUDES) $(UD_INCLUDES)
+CXX         := arm-none-eabi-g++
+OBJCOPY     := arm-none-eabi-objcopy
+OBJDUMP     := arm-none-eabi-objdump
+CXXWARNFLAGS:= -Wall -Wextra -pedantic -ansi
+CXXFLAGS    := $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) $(CXXWARNFLAGS) -MMD -fdiagnostics-color=always -std=$(CPP_VERSION)
+LDFLAGS     := $(MBED_LDFLAGS) $(MBED_CPU) $(_LDFLAGS)
+LDLIBS      := $(MBED_LDSYSLIBS) $(_LDLIBS)
+INCLUDES    := $(MBED_INCLUDES) $(UD_INCLUDES)
 # ==          == #
-# == Tests variables == #
-TESTFLAGS   = $(CXXFLAGS) -I$(shell pwd)/$(SRCDIR)
-TESTLDFLAGS = 
-TESTLDLIBS  = 
-# ==                == #
 # == Sources == #
-SRC         = $(wildcard $(SRCDIR)/*.cpp) $(UD_SRC)
-LIBSRC      = $(UD_LIBSRC)
-TESTSRC     = $(wildcard $(TESTDIR)/*.cpp) $(UD_TESTSRC)
+SRC         := $(wildcard $(SRCDIR)/*.cpp) $(UD_SRC)
+LIBSRC      := $(UD_LIBSRC)
 # ==         == #
 
 # == Build directory == #
 ifneq ($(DEBUG),1)
-MODE        = release
+MODE        := release
 CXXFLAGS   += -DNDEBUG -Os
 else
-MODE        = debug
+MODE        := debug
 CXXFLAGS   += -DDEBUG -O0
 endif
-BUILD       = $(strip $(BUILDDIR)/$(MODE))
-TESTBUILD   = $(strip $(BUILD)/$(TESTDIR))
-TESTLDFLAGS+= -L$(BUILD)
+BUILD       := $(strip $(BUILDDIR)/$(NUCLEO)/$(MODE))
 # ==                 == #
 # == Output files == #
-OBJECTS     = $(addprefix $(BUILD)/,$(MBED_OBJECTS)) $(addprefix $(BUILD)/,$(SRC:.cpp=.o))
-EXE         = $(BUILD)/$(shell basename $$(pwd))
-ELF         = $(EXE).elf
-BIN         = $(EXE).bin
-HEX         = $(EXE).hex
-LST         = $(EXE).lst
+OBJECTS     := $(addprefix $(BUILD)/,$(MBED_OBJECTS)) $(addprefix $(BUILD)/,$(SRC:.cpp=.o))
+EXE         := $(BUILD)/$(shell basename $$(pwd))
+ELF         := $(EXE).elf
+BIN         := $(EXE).bin
+HEX         := $(EXE).hex
+LST         := $(EXE).lst
 
-LIBOBJS     = $(addprefix $(BUILD)/,$(LIBSRC:.cpp=.o))
-LIBOUT      = $(BUILD)/lib$(shell basename $$(pwd)).a
-
-TESTOBJS    = $(addprefix $(BUILD)/,$(TESTSRC:.cpp=.o))
-TESTEXE     = $(TESTBUILD)/tests_$(shell basename $$(pwd))
+LIBOBJS     := $(addprefix $(BUILD)/,$(LIBSRC:.cpp=.o))
+LIBOUT      := $(BUILD)/lib$(shell basename $$(pwd)).a
 
 OUTLIST     =
 ifneq ($(OBJECTS),)
@@ -70,9 +82,6 @@ OUTLIST    += bin hex lst
 endif
 ifneq ($(LIBOBJS),)
 OUTLIST    += lib
-endif
-ifneq ($(TESTOBJS),)
-OUTLIST    += tests
 endif
 # ==              == #
 
@@ -91,47 +100,23 @@ NOCOLOR = \e[0m
 # ==         == #
 
 # == Rules == #
-.PHONY: all exe lib tests run run-test run-tests run-tests-once clean purge clean-tests purge-tests purge-all
+.PHONY: all bin hex lst lib lib clean purge purge-all
 
 all: $(OUTLIST)
-exe: $(EXE)
 bin: $(BIN)
 hex: $(HEX)
 lst: $(LST)
 lib: $(LIBOUT)
-tests: $(TESTEXE)
-ifneq ($(LIBOBJS),)
-$(TESTEXE): $(LIBOUT)
-endif
 
-run: exe
-	./$(EXE) $(ARGS)
-ifneq ($(TESTOBJS),)
-run-tests-once: all
-	$(ECHO) $(BLUE)Running all tests$(NOCOLOR)
-	@$(TESTEXE) $(TESTOPTS)
-run-tests: all
-	@tests=$$($(TESTEXE) -t|tail -n+2|head -n+2|tr -d ' '|cut -d'[' -f2|cut -d']' -f1);\
-    for test in $$tests; do make -s run-test TEST=$$test; done
-run-test: all
-	$(ECHO) $(BLUE)Running test: $(TEST)$(NOCOLOR)
-	@$(TESTEXE) $(TESTOPTS) "[$(TEST)]"||true
-endif
 # ==== Cleanup rules ==== #
 clean:
 	$(RM) $(OBJECTS)
 purge:
 	$(RM) $(BUILD)
-clean-tests:
-	$(RM) $(TESTOBJS)
-purge-tests:
-	$(RM) $(TESTBUILD)
 purge-all:
 	$(RM) $(BUILDDIR)
 # ====               ==== #
 # ==== Output generation ==== #
-$(EXE): $(OBJECTS)
-	$(CXX) -o$@ $^ $(LDFLAGS) $(LDLIBS)
 $(ELF): $(LINKER_SCRIPT) $(OBJECTS)
 	$(CXX) $(LDFLAGS) -o$@ -T$^ $(LDLIBS)
 $(BIN): $(ELF)
@@ -146,21 +131,18 @@ $(BUILD)/mbed/%.o: mbed/%.o
 $(BUILD)/%.o: %.cpp
 	$(MKDIR) $(dir $@)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o$@ -c $<
--include .targets.mk
+size: $(ELF)
+ifneq ($(FLASHSIZE),0)
+	@printf '$(RED)Flash: %6d bytes (%2d%%)$(NOCOLOR)\n' $(FLASH) $(shell echo $$((100*$(FLASH)/$(FLASHSIZE))))
+	@printf '$(RED)RAM:   %6d bytes (%2d%%)$(NOCOLOR)\n' $(RAM)   $(shell echo $$(((100*$(RAM)/$(RAMSIZE)))))
+else
+	@printf '$(RED)Error: flash size undefined$(NOCOLOR)\n'
+endif
 # ====                   ==== #
 # ==== Output lib generation ==== #
 $(LIBOUT): $(LIBOBJS)
 	$(AR) $@ $^
 # ====                       ==== #
-# ==== Tests generation ==== #
-ifneq ($(TESTOBJS),)
-$(TESTEXE): $(TESTOBJS)
-	$(CXX) $(TESTFLAGS) -o$@ $^ $(TESTLDFLAGS) $(TESTLDLIBS)
-$(TESTBUILD)/%.o: $(TESTDIR)/%.cpp
-	$(MKDIR) $(dir $@)
-	$(CXX) $(TESTFLAGS) -o$@ -c $< $(TESTLDFLAGS) $(TESTLDLIBS)
-endif
-# ====                  ==== #
 # ==== Dependencies gen ==== #
 DEPS = $(OBJECTS:.o=.d) $(TESTOBJS:.o=.d)
 -include $(DEPS)
