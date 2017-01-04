@@ -39,12 +39,9 @@ for project in $projects; do
     [ ! -d "$dname" ] && error "Error: project $project not found"
 
     make -C $dname purge
-    rm -rf $dname/mbed $dname/.gdbinit $dname/.openocd.cfg $dname/st_nucleo_f401re.cfg
-    rm -rf $dname/.*.mk $dname/.memory $dname/[Mm]akefile
-    rm -rf $dname/src/startup_stm32f4xx.S $dname/src/stm32f401re_flash.ld $dname/src/stm32f401re_sram.ld $dname/src/system_stm32f4xx
-    rm -rf $dname/inc/stm32f4xx.h $dname/inc/system_stm32f4xx.h $dname/inc/stm32f401re_flash.ld $dname/inc/stm32f401re_sram.ld $dname/inc/system_stm32f4xx
-    cp -rf mbed $dname/
-    cp -rf .mk $dname/
-    cp Makefile $dname/
+    rm -rf $dname/mbed $dname/.mk 
+		cp -rf mbed $dname/
+    cp -f Makefile $dname/
+		cp -f .targets.mk $dname/
 done
 exit 0

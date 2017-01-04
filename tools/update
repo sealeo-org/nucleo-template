@@ -25,11 +25,9 @@ for project in $projects; do
     [ ! -d "$dname" ] && error "Error: project $project not found"
 
     make -C $dname purge
-    rm -rf $dname/mbed
-    cp -rf mbed $dname
-
-    rm -f $dname/.mbed.mk
-    cp -rf .mk $dname
+    rm -rf $dname/mbed $dname/.targets.mk
+    cp -rf mbed $dname/
+    cp -f .targets.mk $dname/
 done
 
 echo "Warning: main makefile not updated! Think about checking out new version"
