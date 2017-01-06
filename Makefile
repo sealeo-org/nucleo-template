@@ -6,10 +6,10 @@ LABEL				:= NODE_$(NUCLEO)
 # == Configuration == #
 UD_SRC      :=
 UD_LIBSRC   :=
-UD_TESTSRC  :=
+UD_CXXFLAGS :=
+UD_INCLUDES :=
 UD_LDFLAGS  :=
 UD_LDLIBS   :=
-UD_INCLUDES :=
 
 DEBUG       := 0
 CPP_VERSION	:= c++11
@@ -46,15 +46,19 @@ CXX         := arm-none-eabi-g++
 OBJCOPY     := arm-none-eabi-objcopy
 OBJDUMP     := arm-none-eabi-objdump
 CXXWARNFLAGS:= -Wall -Wextra -pedantic -ansi
-CXXFLAGS    := $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) $(CXXWARNFLAGS) -MMD -std=$(CPP_VERSION)
+CXXFLAGS    := $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) $(CXXWARNFLAGS) -MMD -std=$(CPP_VERSION) $(UD_CXXFLAGS)
 LDFLAGS     := $(MBED_LDFLAGS) $(MBED_CPU) $(_LDFLAGS)
 LDLIBS      := $(MBED_LDSYSLIBS) $(_LDLIBS)
 INCLUDES    := $(MBED_INCLUDES) $(UD_INCLUDES)
 # ==          == #
 # == Sources == #
-SRC         := $(wildcard $(SRCDIR)/*.cpp) $(UD_SRC)
+SRC         := $(shell find $(SRCDIR) -name '*.cpp') $(UD_SRC)
 LIBSRC      := $(UD_LIBSRC)
 # ==         == #
+CXXVER      := $(shell $(CXX) -dumpversion)
+CXXMAJOR    := $(shell echo $(CXXVER)|cut -d'.' -f1)
+CXXMINOR    := $(shell echo $(CXXVER)|cut -d'.' -f2)
+CXXREV      := $(shell echo $(CXXVER)|cut -d'.' -f3)
 ifeq ($(CXXMAJOR),$(filter $(CXXMAJOR),5 6 7))
   CXXFLAGS  += -fdiagnostics-color=always
 else
