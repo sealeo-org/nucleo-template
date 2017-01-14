@@ -17,6 +17,7 @@ mkdir -p $dname || error "Error: cannot create $dname"
 cp -rf mbed $dname/
 cp -rf src $dname/
 cp Makefile $dname/
+cp .targets.mk $dname/
 cp Doxyfile $dname/
 cp .gitignore $dname/
 mkdir $dname/inc $dname/lib
