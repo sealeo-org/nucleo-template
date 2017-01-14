@@ -127,7 +127,7 @@ ifneq ($(VALID_TARGET),1)
 all: invalid_target
 upload: invalid_target
 else
-all: $(OUTLIST)
+all: $(OUTLIST) size
 bin: $(BIN)
 hex: $(HEX)
 lst: $(LST)
@@ -194,8 +194,8 @@ $(BUILD)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o$@ -c $<
 size: $(ELF)
 ifneq ($(FLASHSIZE),0)
-	@printf '$(RED)Flash: %6d bytes (%2d%%)$(NOCOLOR)\n' $(FLASH) $(shell echo $$((100*$(FLASH)/$(FLASHSIZE))))
-	@printf '$(RED)RAM:   %6d bytes (%2d%%)$(NOCOLOR)\n' $(RAM)   $(shell echo $$(((100*$(RAM)/$(RAMSIZE)))))
+	@printf '$(BLUE)Flash: %6d bytes (%2d%%)$(NOCOLOR)\n' $(FLASH) $(shell echo $$((100*$(FLASH)/$(FLASHSIZE))))
+	@printf '$(BLUE)RAM:   %6d bytes (%2d%%)$(NOCOLOR)\n' $(RAM)   $(shell echo $$(((100*$(RAM)/$(RAMSIZE)))))
 else
 	@printf '$(RED)Error: flash size undefined$(NOCOLOR)\n'
 endif
