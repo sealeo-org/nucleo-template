@@ -1,7 +1,6 @@
 Installation
 Using nucleo-template with docker:
 * install Docker
-* docker build -t nucleo .
 * tools/clone NAME # this will create a project in the parent directory
 * tools/dmake must be used instead of make
 
