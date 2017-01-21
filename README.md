@@ -1,30 +1,44 @@
-Installation
-Using nucleo-template with docker:
-* install Docker
-* tools/clone NAME # this will create a project in the parent directory
-* tools/dmake must be used instead of make
+# Nucleo-template
 
-Should you want to use OpenOCD:
-* wget http://ufpr.dl.sourceforge.net/project/openocd/openocd/0.9.0/openocd-0.9.0.tar.bz2 -Oopenocd-0.9.0.tar.bz2
-* tar jxf openocd-0.9.0.tar.bz2
-* cd openocd-0.9.0
-* ./configure --enable-ftdi --enable-stlink && make && sudo make install
+## Descritpion
+This repository contains required tools to compile for nucleo devices with GCC ARM
 
-See tools directory
+## Usage
+### Project creation
+You can simply clone the repository, then run:
+```bash
+tools/clone $name
+```
+where $name is the name of your project to create (its path will be ../$name). It is possible to specify an absolute path (including the name).
 
-Update
-Updating nucleo-template is done by:
+In case of update, run
+```bash
 git pull
+tools/update $name
+```
 
-You can choose the branch you want to track, but you should keep working on master
+(you can replace `tools/update` by `tools/full-update` if the changes are big, but you will lose your user-defined Makefile)
 
-After an update, you should execute:
-* for minor update: tools/update [ProjectName...]
-* for major update: tools/full-update [ProjectName...]
+### Compilation by docker
+Link, or copy, the file `tools/dmake` to somewhere that is in your $PATH
 
-The update tool is safe and will only update mbed libraries and sub makefiles
-You can pass multiple project names to update all at once
+Then, you can simply replace any call to `make` like that:
+```bash
+dmake
+```
 
-The full-update tool is a bit more aggressive, it will update all makefiles and
-try to remove old files that are now unnecessary.
-It is advised to make a backup before calling it (by git stash, for exemple, or a simple copy)
+# Features
+## Compatible devices
+
+* F303K8 (currently, any serial-based feature do not work for this device)
+* F401RE
+
+## Makefile
+
+* Compilation (obviously) for specific target, displaying informations like memory usage
+* Upload (auto mount/unmount if run by the docker) (`make upload`)
+
+## Docker
+
+* Isolation of the toolchain (GCC ARM): no dependencies, ...
+* Up-to-date compilers (docker Archlinux)
