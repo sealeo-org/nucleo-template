@@ -179,19 +179,21 @@ purge-all:
 # ====               ==== #
 # ==== Output generation ==== #
 $(ELF): $(LINKER_SCRIPT) $(OBJECTS)
-	$(CXX) $(LDFLAGS) -o$@ -T$^ $(LDLIBS)
+	$(ECHO) "$(GREEN)Linking: $@$(NOCOLOR)"
+	@$(CXX) $(LDFLAGS) -o$@ -T$^ $(LDLIBS)
 $(BIN): $(ELF)
-	$(OBJCOPY) -O binary $< $@
+	@$(OBJCOPY) -O binary $< $@
 $(HEX): $(ELF)
-	$(OBJCOPY) -O ihex $< $@
+	@$(OBJCOPY) -O ihex $< $@
 $(LST): $(ELF)
-	$(OBJDUMP) -Sdh $< > $@
+	@$(OBJDUMP) -Sdh $< > $@
 $(BUILD)/mbed/%.o: mbed/%.o
 	$(MKDIR) $(dir $@)
 	$(CP) $< $@
 $(BUILD)/%.o: %.cpp
+	$(ECHO) "$(GREEN)Compiling: $@$(NOCOLOR)"
 	$(MKDIR) $(dir $@)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o$@ -c $<
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -o$@ -c $<
 size: $(ELF)
 ifneq ($(FLASHSIZE),0)
 	@printf '$(BLUE)Flash: %6d bytes (%2d%%)$(NOCOLOR)\n' $(FLASH) $(shell echo $$((100*$(FLASH)/$(FLASHSIZE))))
