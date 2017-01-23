@@ -21,7 +21,7 @@ BUILDDIR    := build
 -include .targets.mk
 # == MBED ==#
 MBED_CPU				:= -mcpu=cortex-m$(CORTEXM) -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
-MBED_CXXFLAGS		:= -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer
+MBED_CXXFLAGS		:= -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti
 
 TARGET_NAME			:= TARGET_NUCLEO_$(NUCLEO)
 TARGET_ID				:= TARGET_STM32F$(NUCLEO_ID)
@@ -36,7 +36,7 @@ MBED_INCLUDES		:= -Imbed -Imbed/drivers -Imbed/hal -Imbed/platform $(MBED_NUCLEO
 MBED_CXXDEFINES := -D__MBED__=1 -D$(TARGET_ID) -DTARGET_LIKE_MBED -D$(TARGET_NAME) -DTARGET_RTOS_M4_M7 -DDEVICE_RTC=1 -DTOOLCHAIN_object -DDEVICE_SERIAL_ASYNCH=1 -DMBED_BUILD_TIMESTAMP=1476920540.02 -D__CMSIS_RTOS -DTOOLCHAIN_GCC -DTARGET_CORTEX_M -DTARGET_LIKE_CORTEX_M$(CORTEXM) -DTARGET_M$(CORTEXM) -DTARGET_UVISOR_UNSUPPORTED -DDEVICE_SERIAL=1 -DDEVICE_INTERRUPTIN=1 -DDEVICE_I2C=1 -DDEVICE_PORTOUT=1 -DDEVICE_I2CSLAVE=1 -D__CORTEX_M$(CORTEXM) -DDEVICE_STDIO_MESSAGES=1 -DTARGET_STM32$(NUCLEO) -DTARGET_FF_MORPHO -D__FPU_PRESENT=1 -DTARGET_FF_ARDUINO -DDEVICE_PORTIN=1 -DTARGET_RELEASE -DTARGET_STM -DDEVICE_SERIAL_FC=1 -DDEVICE_PORTINOUT=1 -D__MBED_CMSIS_RTOS_CM -DDEVICE_SLEEP=1 -DTOOLCHAIN_GCC_ARM -DDEVICE_SPI=1 -DDEVICE_ERROR_RED=1 -DDEVICE_SPISLAVE=1 -DDEVICE_ANALOGIN=1 -DDEVICE_PWMOUT=1 -DARM_MATH_CM4 -include mbed/mbed_config.h
 
 MBED_LDFLAGS		:= -Wl,--gc-sections -Wl,--wrap,main -L$(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM
-MBED_LDSYSLIBS	:= -lstdc++ -lsupc++ -lmbed -lc -lc -lgcc -lnosys
+MBED_LDSYSLIBS	:= -lstdc++ -lsupc++ -lmbed -lc -lgcc -lnosys
 
 MBED_OBJECTS		:= $(shell find $(NUCLEO_TARGET) -name '*.o')
 LINKER_SCRIPT		:= $(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM/$(LDFILE)
