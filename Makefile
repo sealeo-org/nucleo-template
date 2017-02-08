@@ -144,7 +144,7 @@ MOUNTPOINT= $(shell findmnt -cfno target $(DEVICE))
 
 ifeq ($(MOUNTPOINT),)
 ifeq ($(shell id -u),0)
-upload:
+upload: all
 	$(MOUNT) $(DEVICE) /mnt
 	$(CP) $(BIN) /mnt
 	$(SYNC)
