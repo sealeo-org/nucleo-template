@@ -47,9 +47,9 @@ OBJCOPY     := arm-none-eabi-objcopy
 OBJDUMP     := arm-none-eabi-objdump
 CXXWARNFLAGS:= -Wall -Wextra -pedantic -ansi
 CXXFLAGS    := $(MBED_CXXFLAGS) $(MBED_CXXDEFINES) $(MBED_CPU) $(CXXWARNFLAGS) -MMD -std=$(CPP_VERSION) $(UD_CXXFLAGS)
-LDFLAGS     := $(MBED_LDFLAGS) $(MBED_CPU) $(_LDFLAGS)
-LDLIBS      := $(MBED_LDSYSLIBS) $(_LDLIBS)
-INCLUDES    := $(MBED_INCLUDES) $(UD_INCLUDES)
+LDFLAGS     := -Llib $(MBED_LDFLAGS) $(MBED_CPU) $(UD_LDFLAGS)
+LDLIBS      := $(MBED_LDSYSLIBS) $(UD_LDLIBS)
+INCLUDES    := -Iinc $(MBED_INCLUDES) $(UD_INCLUDES)
 # ==          == #
 # == Sources == #
 SRC         := $(shell find $(SRCDIR) -name '*.cpp') $(UD_SRC)
