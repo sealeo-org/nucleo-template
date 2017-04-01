@@ -1,8 +1,18 @@
 #!/bin/bash
+
 # Configuration
 ## Docker image
 image=sealeo/nucleo-template
 ## Project name
 projectname=$(basename $(pwd))
 
-docker run --rm --privileged -v /etc/passwd:/etc/passwd:ro -v /dev:/dev -v $(pwd):/mnt/$projectname $image /bin/bash -c "cd /mnt/$projectname; make $@; chown 2>/dev/null -R $USER: build"
+while getopts ":l:" opt; do
+    case "${opt}" in
+        l)
+		MOUNT_OPTS="-v ${OPTARG}:/mnt/$projectname/src/$(basename ${OPTARG})"
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+docker run --rm --privileged -v /etc/passwd:/etc/passwd:ro -v /dev:/dev -v $(pwd):/mnt/$projectname $MOUNT_OPTS $image /bin/bash -c "cd /mnt/$projectname; make $@; chown 2>/dev/null -R $USER: build"
