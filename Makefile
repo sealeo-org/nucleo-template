@@ -1,7 +1,8 @@
 # == NUCLEO == #
-NUCLEO      := 
-DISKDIR			:= /dev/disk/by-label
-LABEL				:= NODE_$(NUCLEO)
+NUCLEO      :=
+DISKDIR		:= /dev/disk/by-label
+LABEL		:= NODE_$(NUCLEO)
+UPLOAD		:= disk# disk or jlink
 # ==        == #
 # == Configuration == #
 UD_SRC      :=
@@ -107,7 +108,9 @@ AR				:= @ar rvs
 CP				:= @cp -rf
 SYNC			:= @sync
 MOUNT			:= @mount
-UMOUNT		:= @umount
+UMOUNT			:= @umount
+GENJLINK		:= @gen-jlink
+JLINK			:= @JLinkExe -if SWD -speed 4000 -autoconnect 1 -CommanderScript /tmp/script.jlink
 
 RED				:= \e[1;31m
 GREEN			:= \e[1;32m
@@ -133,6 +136,7 @@ hex: $(HEX)
 lst: $(LST)
 lib: $(LIBOUT)
 
+ifeq ($(UPLOAD),disk)
 DEVICE		= $(shell readlink -f $(DISKDIR)/$(LABEL))
 
 ifeq ($(DEVICE),)
@@ -158,6 +162,11 @@ upload: all
 	$(SYNC)
 endif	# MOUNTED
 endif	# VALID DEVICE
+else
+upload: all
+	$(GENJLINK) $(NUCLEO) $(BIN)
+	$(JLINK)
+endif	# UPLOAD
 
 endif	# VALID TARGET
 endif # NUCLEO
