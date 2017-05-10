@@ -1,0 +1,16 @@
+#!/bin/bash
+
+error() {
+    echo>&2 $1
+    exit 1
+}
+
+[ $# -ne 2 ] && error "Arguments missing"
+
+cat <<EOF > /tmp/script.jlink
+device STM32$1
+loadbin $2,0x8000000
+r
+g
+exit
+EOF
