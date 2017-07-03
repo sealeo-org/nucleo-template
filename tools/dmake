@@ -7,4 +7,4 @@ projectname=$(basename $(pwd))
 
 prms="$@"
 
-docker run --rm --privileged -v /etc/passwd:/etc/passwd:ro -v /dev:/dev -v $(pwd):/mnt/$projectname $image /bin/bash -c "cd /mnt/$projectname; make $prms; chown 2>/dev/null -R $USER: build"
+docker run --rm --privileged -v /etc/passwd:/etc/passwd:ro -it -v /dev:/dev -v $(pwd):/mnt/$projectname $image /bin/bash -c "cd /mnt/$projectname; make $prms; chown 2>/dev/null -R $USER: build"
