@@ -111,6 +111,7 @@ MOUNT			:= @mount
 UMOUNT			:= @umount
 GENJLINK		:= @gen-jlink
 JLINK			:= @JLinkExe -if SWD -speed 4000 -autoconnect 1 -CommanderScript /tmp/script.jlink
+JLINK_DBG		:= JLinkGDBServer -if SWD -speed 4000 -endian little
 
 RED				:= \e[1;31m
 GREEN			:= \e[1;32m
@@ -166,6 +167,9 @@ else
 upload: all
 	$(GENJLINK) $(NUCLEO) $(BIN)
 	$(JLINK)
+
+debug:
+	$(JLINK_DBG) -device STM32$(NUCLEO)
 endif	# UPLOAD
 
 endif	# VALID TARGET
