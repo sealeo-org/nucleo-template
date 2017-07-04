@@ -1,8 +1,8 @@
 # == NUCLEO == #
-NUCLEO      :=
+NUCLEO      := F401CD
 DISKDIR		:= /dev/disk/by-label
 LABEL		:= NODE_$(NUCLEO)
-UPLOAD		:= disk# disk or jlink
+UPLOAD		:= jlink# disk or jlink
 # ==        == #
 # == Configuration == #
 UD_SRC      :=
@@ -11,6 +11,8 @@ UD_CXXFLAGS :=
 UD_INCLUDES :=
 UD_LDFLAGS  :=
 UD_LDLIBS   :=
+
+GDB_PORT    := 2331
 
 DEBUG       := 0
 CPP_VERSION	:= c++11
@@ -169,7 +171,8 @@ upload: all
 	$(JLINK)
 
 debug:
-	$(JLINK_DBG) -device STM32$(NUCLEO)
+	@(sleep 2 ; echo -e "\n\n$(GREEN)GDB server address: $$(cat /etc/hosts | grep $$(cat /etc/hostname) | sed -r 's/^\s*(\S+)(\s+.*)?$$/\1/'):$(GDB_PORT)\n$(NOCOLOR)") &
+	$(JLINK_DBG) -device STM32$(NUCLEO) -port $(GDB_PORT)
 endif	# UPLOAD
 
 endif	# VALID TARGET
