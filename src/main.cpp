@@ -5,7 +5,10 @@
 int main() {
 	using namespace mbed;
 
-	DigitalOut led(LED1);
+	DigitalOut led(PB_15);
 	Serial usb(USBTX, USBRX);
-	for(;;) led = !led, wait(.5f);
+	for(;;) {
+		led = !led;
+	   	wait(.5f);
+	}
 }

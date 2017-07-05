@@ -1,0 +1,14 @@
+#!/bin/bash
+# Configuration
+## Docker image
+image=sealeo/nucleo-template:gdb
+## Project name
+projectname=$(basename $(pwd))
+
+prms="$@"
+
+docker run --rm --privileged -it \
+	-v /etc/passwd:/etc/passwd:ro \
+	-v /dev:/dev \
+	-v $(pwd):/mnt/$projectname \
+	$image /bin/bash -c "cd /mnt/$projectname ; gdb-client $prms"

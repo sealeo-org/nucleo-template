@@ -14,7 +14,7 @@ UD_LDLIBS   :=
 
 GDB_PORT    := 2331
 
-DEBUG       := 0
+DEBUG       := 1
 CPP_VERSION	:= c++11
 # ==							 == #
 # == Directories == #
@@ -78,7 +78,7 @@ ifneq ($(DEBUG),1)
   CXXFLAGS		+= -DNDEBUG -Os
 else
   MODE        := debug
-  CXXFLAGS		+= -DDEBUG -O0
+  CXXFLAGS		+= -DDEBUG -O0 -g
 endif
 BUILD       := $(strip $(BUILDDIR)/$(NUCLEO)/$(MODE))
 # ==                 == #
@@ -192,6 +192,10 @@ purge:
 	$(RM) $(BUILD)
 purge-all:
 	$(RM) $(BUILDDIR)
+
+print-bin:
+	$(ECHO) $(ELF)
+
 # ====               ==== #
 # ==== Output generation ==== #
 $(ELF): $(LINKER_SCRIPT) $(OBJECTS)
