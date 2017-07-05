@@ -110,8 +110,8 @@ AR				:= @ar rvs
 CP				:= @cp -rf
 SYNC			:= @sync
 MOUNT			:= @mount
-UMOUNT			:= @umount
-GENJLINK		:= @gen-jlink
+UMOUNT    := @umount
+GENJLINK  := @gen-jlink
 JLINK			:= @JLinkExe -if SWD -speed 4000 -autoconnect 1 -CommanderScript /tmp/script.jlink
 JLINK_DBG		:= JLinkGDBServer -if SWD -speed 4000 -endian little
 
