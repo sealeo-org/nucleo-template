@@ -30,3 +30,4 @@ RUN pacman --noconfirm -Rs wget yaourt sudo file fakeroot
 RUN pacman --noconfirm -Sc
 
 ADD tools/gen-jlink /usr/bin/
+ADD tools/gdb-client /usr/bin/
