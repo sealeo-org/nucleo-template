@@ -1,7 +1,7 @@
 #!/bin/bash
 # Configuration
 ## Docker image
-image=sealeo/nucleo-template:gdb
+image=sealeo/nucleo-template
 ## Project name
 projectname=$(basename $(pwd))
 
