@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 help() {
 	echo -e "Usage:\n\n    \e[01m$0 <address>:<port>\e[00m\n"
 	echo '<address> the IP or hostname of the GDB server'
@@ -16,14 +14,8 @@ help() {
 echo "$1" | grep -Eq '[^:]+:[^:]+' || help 2
 
 root='.'
-gdb_cfg_file=$(mktemp /tmp/gdb_cfg_XXXXXXXX)
 bin_file=$(make print-bin)
 src_dir="$root/src"
 gdb='arm-none-eabi-gdb'
 
-cat <<EOF >$gdb_cfg_file
-target remote $1
-EOF
-
 cgdb -d $gdb -- -d $src_dir -ex "target remote $1" $bin_file 
-rm $gdb_cfg_file
