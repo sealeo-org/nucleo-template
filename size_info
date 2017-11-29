@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ELF=$1
+flashsize=$2
+ramsize=$3
+
+RED='\e[1;32m'
+BLUE='\e[1;34m'
+NOCOLOR='\e[0m'
+
+size=$(arm-none-eabi-size $ELF|tail -1|tr -s ' '|cut -d' ' -f2,3,4)
+textsize=$(echo $size|cut -d' ' -f1)
+datasize=$(echo $size|cut -d' ' -f2)
+bsssize=$(echo $size|cut -d' ' -f3)
+flash=$((textsize+datasize))
+ram=$((datasize+bsssize))
+
+if [ "$flashsize" -eq 0 ] || [ "$ramsize" -eq 0 ]; then
+	printf "${RED}Error: flash or ram size undefined${NOCOLOR}"
+else
+	printf "${BLUE}Flash: %6d bytes (%2d%%)${NOCOLOR}\n" $flash $(echo $((100*flash/flashsize)))
+	printf "${BLUE}RAM:   %6d bytes (%2d%%)${NOCOLOR}\n" $ram   $(echo $(((100*ram/ramsize))))
+fi
