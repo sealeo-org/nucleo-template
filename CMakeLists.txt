@@ -49,11 +49,11 @@ include(targets.cmake)
 set(TARGET_NAME   "TARGET_NUCLEO_${NUCLEO}")
 set(TARGET_ID     "TARGET_STM32F${NUCLEO_ID}")
 
-set(NUCLEO_TARGET "mbed/${TARGET_NAME}")
+set(NUCLEO_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/mbed/${TARGET_NAME}")
 set(NUCLEO_STM    "${NUCLEO_TARGET}/TARGET_STM")
 set(NUCLEO_STM_ID "${NUCLEO_STM}/${TARGET_ID}")
 
-set(LINKER_SCRIPT	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM/${LDFILE})
+set(LINKER_SCRIPT	${NUCLEO_TARGET}"/TOOLCHAIN_GCC_ARM/"${LDFILE})
 
 ## Compiler variables
 set(MBED_CXXFLAGS "-mcpu=cortex-m${CORTEXM} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti")
@@ -63,7 +63,7 @@ set(MBED_CXX_DEFS "-D__MBED__=1 -D${TARGET_ID} -DTARGET_LIKE_MBED -D${TARGET_NAM
 set(MBED_INCLUDES mbed mbed/drivers mbed/hal mbed/platform ${NUCLEO_TARGET} ${NUCLEO_STM} ${NUCLEO_STM_ID} ${NUCLEO_STM_ID}/${TARGET_NAME} ${NUCLEO_STM_ID}/${TARGET_NAME}/device ${NUCLEO_STM_ID}/device ${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM)
 
 set(MBED_LDFLAGS  "-Wl,--gc-sections -Wl,--wrap,main -L${CMAKE_CURRENT_SOURCE_DIR}/${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM")
-set(MBED_LDSYS    "-lstdc++ -lsupc++ -lmbed -lc -lgcc -lnosys")
+set(MBED_LDSYS    "-lstdc++ -lsupc++ -lc -lc -lmbed -lgcc -lnosys")
 
 file(GLOB_RECURSE MBED_OBJECTS ${NUCLEO_TARGET}/*.o)
 
@@ -89,5 +89,6 @@ add_custom_target(generate_bin ALL COMMAND ${CMAKE_OBJCOPY} -O binary ${ELF} ${B
 
 add_executable(${ELF} ${src})
 target_include_directories(${ELF} PUBLIC ${MBED_INCLUDES})
+
 target_link_libraries(${ELF} PUBLIC ${MBED_OBJECTS})
 target_link_libraries(${ELF} PUBLIC ${CXX_LIBRARIES})
