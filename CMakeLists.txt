@@ -1,7 +1,7 @@
 set(CMAKE_C_COMPILER          /usr/bin/arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER        /usr/bin/arm-none-eabi-g++)
 set(CMAKE_ASM_COMPILER        /usr/bin/arm-none-eabi-as)
-set(CMAKE_OBJCOPY             /usr/bin/arm-none-eabi-objcopy)
+set(OBJCOPY             			/usr/bin/arm-none-eabi-objcopy)
 
 SET(CMAKE_C_COMPILER_FORCED true)
 SET(CMAKE_CXX_COMPILER_FORCED true)
@@ -53,22 +53,35 @@ set(NUCLEO_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/mbed/${TARGET_NAME}")
 set(NUCLEO_STM    "${NUCLEO_TARGET}/TARGET_STM")
 set(NUCLEO_STM_ID "${NUCLEO_STM}/${TARGET_ID}")
 
-set(LINKER_SCRIPT	${NUCLEO_TARGET}"/TOOLCHAIN_GCC_ARM/"${LDFILE})
+set(LINKER_SCRIPT	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM/${LDFILE})
 
 ## Compiler variables
-set(MBED_CXXFLAGS "-mcpu=cortex-m${CORTEXM} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti")
+set(MBED_CPU      "-mcpu=cortex-m${CORTEXM} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp")
+set(MBED_CXXFLAGS "${MBED_CPU} -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti")
 
 set(MBED_CXX_DEFS "-D__MBED__=1 -D${TARGET_ID} -DTARGET_LIKE_MBED -D${TARGET_NAME} -DTARGET_RTOS_M4_M7 -DDEVICE_RTC=1 -DTOOLCHAIN_object -DDEVICE_SERIAL_ASYNCH=1 -DMBED_BUILD_TIMESTAMP=1476920540.02 -D__CMSIS_RTOS -DTOOLCHAIN_GCC -DTARGET_CORTEX_M -DTARGET_LIKE_CORTEX_M${CORTEXM} -DTARGET_M${CORTEXM} -DTARGET_UVISOR_UNSUPPORTED -DDEVICE_SERIAL=1 -DDEVICE_INTERRUPTIN=1 -DDEVICE_I2C=1 -DDEVICE_PORTOUT=1 -DDEVICE_I2CSLAVE=1 -D__CORTEX_M${CORTEXM} -DDEVICE_STDIO_MESSAGES=1 -DTARGET_STM32${NUCLEO} -DTARGET_FF_MORPHO -D__FPU_PRESENT=1 -DTARGET_FF_ARDUINO -DDEVICE_PORTIN=1 -DTARGET_RELEASE -DTARGET_STM -DDEVICE_SERIAL_FC=1 -DDEVICE_PORTINOUT=1 -D__MBED_CMSIS_RTOS_CM -DDEVICE_SLEEP=1 -DTOOLCHAIN_GCC_ARM -DDEVICE_SPI=1 -DDEVICE_ERROR_RED=1 -DDEVICE_SPISLAVE=1 -DDEVICE_ANALOGIN=1 -DDEVICE_PWMOUT=1 -DARM_MATH_CM4 -include ${CMAKE_CURRENT_SOURCE_DIR}/mbed/mbed_config.h")
 
-set(MBED_INCLUDES mbed mbed/drivers mbed/hal mbed/platform ${NUCLEO_TARGET} ${NUCLEO_STM} ${NUCLEO_STM_ID} ${NUCLEO_STM_ID}/${TARGET_NAME} ${NUCLEO_STM_ID}/${TARGET_NAME}/device ${NUCLEO_STM_ID}/device ${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM)
+set(MBED_INCLUDES
+	${CMAKE_CURRENT_SOURCE_DIR}/mbed
+	${CMAKE_CURRENT_SOURCE_DIR}/mbed/drivers
+	${CMAKE_CURRENT_SOURCE_DIR}/mbed/hal
+	${CMAKE_CURRENT_SOURCE_DIR}/mbed/platform
+	${NUCLEO_TARGET}
+	${NUCLEO_STM}
+	${NUCLEO_STM_ID}
+	${NUCLEO_STM_ID}/${TARGET_NAME}
+	${NUCLEO_STM_ID}/${TARGET_NAME}/device
+	${NUCLEO_STM_ID}/device
+	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM
+)
 
-set(MBED_LDFLAGS  "-Wl,--gc-sections -Wl,--wrap,main -L${CMAKE_CURRENT_SOURCE_DIR}/${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM")
-set(MBED_LDSYS    "-lstdc++ -lsupc++ -lc -lc -lmbed -lgcc -lnosys")
+set(MBED_LDFLAGS  "${MBED_CPU} -Wl,--gc-sections -Wl,--wrap,main -L${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM")
+set(MBED_LDSYS    "-lstdc++ -lsupc++ -lc -lmbed -lgcc -lnosys")
 
 file(GLOB_RECURSE MBED_OBJECTS ${NUCLEO_TARGET}/*.o)
 
 # CXX configuration
-set(CXX_FLAGS         "-Wall -Wextra ${MBED_CXX_FLAGS} ${UD_CXX_FLAGS}")
+set(CXX_FLAGS         "-Wall -Wextra ${MBED_CXXFLAGS} ${UD_CXX_FLAGS}")
 set(CXX_FLAGS_DEBUG   "-DDEBUG -O0 -ggdb3 -pg")
 set(CXX_FLAGS_RELEASE "-DNDEBUG -Os")
 set(CXX_DEFINITIONS   "${MBED_CXX_DEFS} ${UD_CXX_DEFS}")
@@ -85,10 +98,10 @@ set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} --specs=nosys.specs ${MBE
 
 file(GLOB_RECURSE src ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-add_custom_target(generate_bin ALL COMMAND ${CMAKE_OBJCOPY} -O binary ${ELF} ${BIN})
-
 add_executable(${ELF} ${src})
 target_include_directories(${ELF} PUBLIC ${MBED_INCLUDES})
 
 target_link_libraries(${ELF} PUBLIC ${MBED_OBJECTS})
 target_link_libraries(${ELF} PUBLIC ${CXX_LIBRARIES})
+
+add_custom_target(generate_bin ALL COMMAND bash -c "${OBJCOPY} -O binary ${ELF} ${BIN}" DEPENDS ${ELF})

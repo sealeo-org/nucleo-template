@@ -9,6 +9,6 @@ int main() {
 	Serial usb(USBTX, USBRX);
 	for(;;) {
 		led = !led;
-		wait(1.5f);
+		wait(0.5f);
 	}
 }
