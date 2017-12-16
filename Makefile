@@ -5,17 +5,24 @@ LABEL		:= NODE_$(NUCLEO)
 UPLOAD		:= jlink# disk or jlink
 # ==        == #
 # == Configuration == #
-UD_SRC      :=
-UD_LIBSRC   :=
+UD_SRC      := 	\
+								$(shell find include/comp  -name '*.cpp') \
+								$(shell find include/hard -name '*.cpp') \
+								$(shell find include/tools -name '*.cpp') \
+								$(shell find include/rosserial_isibot -name '*.cpp') \
+								$(shell find lib/ros_lib_kinetic/ -name '*.cpp')  
+								
+UD_LIBSRC   := 
 UD_CXXFLAGS :=
-UD_INCLUDES :=
-UD_LDFLAGS  :=
-UD_LDLIBS   :=
+UD_INCLUDES := -Iinclude/rosserial_isibot -Iinclude/comp -Iinclude/tools -Iinclude/hard -Ilib/ros_lib_kinetic/BufferedSerial/ -Ilib/ros_lib_kinetic/ -Ilib/ros_lib_kinetic/BufferedSerial/Buffer/ -Iinclude/
+
+UD_LDFLAGS  := -Wcpp
+UD_LDLIBS   := 
 
 GDB_PORT    := 2331
 
-DEBUG       := 1
-CPP_VERSION	:= c++11
+DEBUG       := 0
+CPP_VERSION	:= c++14
 # ==							 == #
 # == Directories == #
 SRCDIR      := src
@@ -23,23 +30,27 @@ BUILDDIR    := build
 # ==               == #
 -include .targets.mk
 # == MBED ==#
-MBED_CPU				:= -mcpu=cortex-m$(CORTEXM) -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
-MBED_CXXFLAGS		:= -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti
+MBED_CPU			:= -mcpu=cortex-m$(CORTEXM) -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+MBED_CXXFLAGS		:= '-fno-rtti' '-Wvla' '-c' '-Wall' '-Wextra' '-Wno-unused-parameter' '-Wno-missing-field-initializers' '-fmessage-length=0' '-fno-exceptions' '-fno-builtin' '-ffunction-sections' '-fdata-sections' '-funsigned-char' '-MMD' '-fno-delete-null-pointer-checks' '-fomit-frame-pointer' '-Os' '-DMBED_RTOS_SINGLE_THREAD'
 
 TARGET_NAME			:= TARGET_NUCLEO_$(NUCLEO)
 TARGET_ID				:= TARGET_STM32F$(NUCLEO_ID)
+TARGET_XID			:= TARGET_STM32$(NUCLEO_XID)
+TARGET_STM	  := TARGET_STM32F$(NUCLEO)
 
 NUCLEO_TARGET		:= mbed/$(TARGET_NAME)
 NUCLEO_STM			:= $(NUCLEO_TARGET)/TARGET_STM
 NUCLEO_STM_ID		:= $(NUCLEO_STM)/$(TARGET_ID)
+NUCLEO_STM_XID	:= $(NUCLEO_STM_ID)/$(TARGET_XID)
 
-MBED_NUCLEO_INC	:= -I$(NUCLEO_TARGET) -I$(NUCLEO_STM) -I$(NUCLEO_STM_ID) -I$(NUCLEO_STM_ID)/$(TARGET_NAME) -I$(NUCLEO_STM_ID)/$(TARGET_NAME)/device -I$(NUCLEO_STM_ID)/device -I$(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM
+MBED_NUCLEO_INC	:= -I$(NUCLEO_TARGET) -I$(NUCLEO_STM) -I$(NUCLEO_STM_ID) -I$(NUCLEO_STM_XID) -I$(NUCLEO_STM_XID)/$(TARGET_NAME) -I$(NUCLEO_STM_XID)/device -I$(NUCLEO_STM_XID)/$(TARGET_ID) -I$(NUCLEO_STM_ID)/device -I$(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM
+
 MBED_INCLUDES		:= -Imbed -Imbed/drivers -Imbed/hal -Imbed/platform $(MBED_NUCLEO_INC)
 
-MBED_CXXDEFINES := -D__MBED__=1 -D$(TARGET_ID) -DTARGET_LIKE_MBED -D$(TARGET_NAME) -DTARGET_RTOS_M4_M7 -DDEVICE_RTC=1 -DTOOLCHAIN_object -DDEVICE_SERIAL_ASYNCH=1 -DMBED_BUILD_TIMESTAMP=1476920540.02 -D__CMSIS_RTOS -DTOOLCHAIN_GCC -DTARGET_CORTEX_M -DTARGET_LIKE_CORTEX_M$(CORTEXM) -DTARGET_M$(CORTEXM) -DTARGET_UVISOR_UNSUPPORTED -DDEVICE_SERIAL=1 -DDEVICE_INTERRUPTIN=1 -DDEVICE_I2C=1 -DDEVICE_PORTOUT=1 -DDEVICE_I2CSLAVE=1 -D__CORTEX_M$(CORTEXM) -DDEVICE_STDIO_MESSAGES=1 -DTARGET_STM32$(NUCLEO) -DTARGET_FF_MORPHO -D__FPU_PRESENT=1 -DTARGET_FF_ARDUINO -DDEVICE_PORTIN=1 -DTARGET_RELEASE -DTARGET_STM -DDEVICE_SERIAL_FC=1 -DDEVICE_PORTINOUT=1 -D__MBED_CMSIS_RTOS_CM -DDEVICE_SLEEP=1 -DTOOLCHAIN_GCC_ARM -DDEVICE_SPI=1 -DDEVICE_ERROR_RED=1 -DDEVICE_SPISLAVE=1 -DDEVICE_ANALOGIN=1 -DDEVICE_PWMOUT=1 -DARM_MATH_CM4 -include mbed/mbed_config.h
+MBED_CXXDEFINES := $(NUCLEO_FLAGS)
 
 MBED_LDFLAGS		:= -Wl,--gc-sections -Wl,--wrap,main -L$(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM
-MBED_LDSYSLIBS	:= -lstdc++ -lsupc++ -lmbed -lc -lgcc -lnosys
+MBED_LDSYSLIBS	:= -lstdc++ -lsupc++ -lmbed -lc -lc -lgcc -lnosys
 
 MBED_OBJECTS		:= $(shell find $(NUCLEO_TARGET) -name '*.o')
 LINKER_SCRIPT		:= $(NUCLEO_TARGET)/TOOLCHAIN_GCC_ARM/$(LDFILE)
@@ -110,8 +121,7 @@ AR				:= @ar rvs
 CP				:= @cp -rf
 SYNC			:= @sync
 MOUNT			:= @mount
-UMOUNT    := @umount
-GENJLINK  := @gen-jlink
+UMOUNT		:= @umountGENJLINK  := @gen-jlink
 JLINK			:= @JLinkExe -if SWD -speed 4000 -autoconnect 1 -CommanderScript /tmp/script.jlink
 JLINK_DBG		:= JLinkGDBServer -if SWD -speed 4000 -endian little
 
@@ -177,6 +187,7 @@ endif	# UPLOAD
 
 endif	# VALID TARGET
 endif # NUCLEO
+
 nucleo_unspecified:
 	$(ECHO) "$(RED)Error: you must specify a value for NUCLEO. See Makefile$(NOCOLOR)"
 invalid_target:
@@ -192,10 +203,9 @@ purge:
 	$(RM) $(BUILD)
 purge-all:
 	$(RM) $(BUILDDIR)
-
+	
 print-bin:
 	$(ECHO) $(ELF)
-
 # ====               ==== #
 # ==== Output generation ==== #
 $(ELF): $(LINKER_SCRIPT) $(OBJECTS)
