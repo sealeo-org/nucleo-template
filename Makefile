@@ -5,16 +5,10 @@ LABEL		:= NODE_$(NUCLEO)
 UPLOAD		:= jlink# disk or jlink
 # ==        == #
 # == Configuration == #
-UD_SRC      := 	\
-								$(shell find include/comp  -name '*.cpp') \
-								$(shell find include/hard -name '*.cpp') \
-								$(shell find include/tools -name '*.cpp') \
-								$(shell find include/rosserial_isibot -name '*.cpp') \
-								$(shell find lib/ros_lib_kinetic/ -name '*.cpp')  
-								
+UD_SRC      := 									
 UD_LIBSRC   := 
 UD_CXXFLAGS :=
-UD_INCLUDES := -Iinclude/rosserial_isibot -Iinclude/comp -Iinclude/tools -Iinclude/hard -Ilib/ros_lib_kinetic/BufferedSerial/ -Ilib/ros_lib_kinetic/ -Ilib/ros_lib_kinetic/BufferedSerial/Buffer/ -Iinclude/
+UD_INCLUDES := -Iinclude/
 
 UD_LDFLAGS  := -Wcpp
 UD_LDLIBS   := 

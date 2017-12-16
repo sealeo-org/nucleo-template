@@ -15,7 +15,7 @@ set(ELF           ${project_name}.elf)
 set(BIN           ${project_name}.bin)
 
 ## Nucleo configuration
-set(NUCLEO        "F401RE")
+set(NUCLEO        "F303K8")
 set(DISKDIR       "/dev/disk/by-label")
 set(LABEL         "NODE_${NUCLEO}")
 set(UPLOAD_METHOD "jlink") # {disk, jlink}
@@ -57,11 +57,11 @@ set(LINKER_SCRIPT	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM/${LDFILE})
 
 ## Compiler variables
 set(MBED_CPU      "-mcpu=cortex-m${CORTEXM} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp")
-set(MBED_CXXFLAGS "${MBED_CPU} -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti")
+set(MBED_CXXFLAGS "-fno-rtti -Wvla -c -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -MMD -fno-delete-null-pointer-checks -fomit-frame-pointer -Os -DMBED_RTOS_SINGLE_THREAD")
 
-set(MBED_CXX_DEFS "-D__MBED__=1 -D${TARGET_ID} -DTARGET_LIKE_MBED -D${TARGET_NAME} -DTARGET_RTOS_M4_M7 -DDEVICE_RTC=1 -DTOOLCHAIN_object -DDEVICE_SERIAL_ASYNCH=1 -DMBED_BUILD_TIMESTAMP=1476920540.02 -D__CMSIS_RTOS -DTOOLCHAIN_GCC -DTARGET_CORTEX_M -DTARGET_LIKE_CORTEX_M${CORTEXM} -DTARGET_M${CORTEXM} -DTARGET_UVISOR_UNSUPPORTED -DDEVICE_SERIAL=1 -DDEVICE_INTERRUPTIN=1 -DDEVICE_I2C=1 -DDEVICE_PORTOUT=1 -DDEVICE_I2CSLAVE=1 -D__CORTEX_M${CORTEXM} -DDEVICE_STDIO_MESSAGES=1 -DTARGET_STM32${NUCLEO} -DTARGET_FF_MORPHO -D__FPU_PRESENT=1 -DTARGET_FF_ARDUINO -DDEVICE_PORTIN=1 -DTARGET_RELEASE -DTARGET_STM -DDEVICE_SERIAL_FC=1 -DDEVICE_PORTINOUT=1 -D__MBED_CMSIS_RTOS_CM -DDEVICE_SLEEP=1 -DTOOLCHAIN_GCC_ARM -DDEVICE_SPI=1 -DDEVICE_ERROR_RED=1 -DDEVICE_SPISLAVE=1 -DDEVICE_ANALOGIN=1 -DDEVICE_PWMOUT=1 -DARM_MATH_CM4 -include ${CMAKE_CURRENT_SOURCE_DIR}/mbed/mbed_config.h")
+set(MBED_CXX_DEFS ${NUCLEO_FLAGS})
 
-set(MBED_INCLUDES
+set(MBED_INCLUDES	
 	${CMAKE_CURRENT_SOURCE_DIR}/mbed
 	${CMAKE_CURRENT_SOURCE_DIR}/mbed/drivers
 	${CMAKE_CURRENT_SOURCE_DIR}/mbed/hal
@@ -69,9 +69,11 @@ set(MBED_INCLUDES
 	${NUCLEO_TARGET}
 	${NUCLEO_STM}
 	${NUCLEO_STM_ID}
-	${NUCLEO_STM_ID}/${TARGET_NAME}
-	${NUCLEO_STM_ID}/${TARGET_NAME}/device
-	${NUCLEO_STM_ID}/device
+	${NUCLEO_STM_XID}
+	${NUCLEO_STM_XID}/${TARGET_NAME}
+	${NUCLEO_STM_XID}/device
+	${NUCLEO_STM_XID}/${TARGET_ID}
+	${NUCLEO_STM_ID}/device 
 	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM
 )
 
