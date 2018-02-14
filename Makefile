@@ -1,8 +1,8 @@
 # == NUCLEO == #
-NUCLEO      := F401CD
+NUCLEO      := F401RE
 DISKDIR		:= /dev/disk/by-label
 LABEL		:= NODE_$(NUCLEO)
-UPLOAD		:= jlink# disk or jlink
+UPLOAD		:= disk# disk or jlink
 # ==        == #
 # == Configuration == #
 UD_SRC      :=

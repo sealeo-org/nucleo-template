@@ -6,3 +6,7 @@ build
 *.creator
 *.creator.user*
 *.files
+
+# vi
+.*.swp
+.*.swo
