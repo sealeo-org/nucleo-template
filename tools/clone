@@ -20,6 +20,9 @@ cp Makefile $dname/
 cp .targets.mk $dname/
 cp Doxyfile $dname/
 cp .gitignore $dname/
+cp CMakeLists.txt $dname/
+cp size_info $dname/
+cp targets.cmake $dname/
 mkdir $dname/inc $dname/lib
 
 echo "Info: project created in $dname"
