@@ -15,7 +15,7 @@ set(ELF           ${project_name}.elf)
 set(BIN           ${project_name}.bin)
 
 ## Nucleo configuration
-set(NUCLEO        "F303K8")
+set(NUCLEO        "F401RE")
 set(DISKDIR       "/dev/disk/by-label")
 set(LABEL         "NODE_${NUCLEO}")
 set(UPLOAD_METHOD "disk") # {disk, jlink}
