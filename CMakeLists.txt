@@ -18,7 +18,7 @@ set(BIN           ${project_name}.bin)
 set(NUCLEO        "F401RE")
 set(DISKDIR       "/dev/disk/by-label")
 set(LABEL         "NODE_${NUCLEO}")
-set(UPLOAD_METHOD "jlink") # {disk, jlink}
+set(UPLOAD_METHOD "disk") # {disk, jlink}
 
 ## Sources
 set(UD_SRC        "")
@@ -35,7 +35,7 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
 ## C++
-set(CXX_STANDARD  11)
+set(CXX_STANDARD  14)
 set(UD_CXX_FLAGS  "")
 set(UD_CXX_DEFS   "")
 
@@ -105,3 +105,12 @@ target_link_libraries(${ELF} PUBLIC ${MBED_OBJECTS})
 target_link_libraries(${ELF} PUBLIC ${CXX_LIBRARIES})
 
 add_custom_target(generate_bin ALL COMMAND bash -c "${OBJCOPY} -O binary ${ELF} ${BIN}" DEPENDS ${ELF})
+
+set(DEVICE ${DISKDIR}/${LABEL})
+if(EXISTS ${DEVICE})
+	add_custom_target(upload
+		DEPENDS generate_bin
+		COMMAND mount ${DEVICE} /mnt && cp ${BIN} /mnt && sync && umount /mnt)
+else()
+	add_custom_target(upload COMMAND bash -c "echo !! error: nucleo not found")
+endif()
