@@ -15,7 +15,7 @@ set(ELF           ${project_name}.elf)
 set(BIN           ${project_name}.bin)
 
 ## Nucleo configuration
-set(NUCLEO        "F401RE")
+set(NUCLEO        "F303K8")
 set(DISKDIR       "/dev/disk/by-label")
 set(LABEL         "NODE_${NUCLEO}")
 set(UPLOAD_METHOD "disk") # {disk, jlink}
@@ -49,19 +49,20 @@ include(targets.cmake)
 set(TARGET_NAME   "TARGET_NUCLEO_${NUCLEO}")
 set(TARGET_ID     "TARGET_STM32F${NUCLEO_ID}")
 
-set(NUCLEO_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/mbed/${TARGET_NAME}")
-set(NUCLEO_STM    "${NUCLEO_TARGET}/TARGET_STM")
-set(NUCLEO_STM_ID "${NUCLEO_STM}/${TARGET_ID}")
+set(NUCLEO_TARGET   "${CMAKE_CURRENT_SOURCE_DIR}/mbed/${TARGET_NAME}")
+set(NUCLEO_STM      "${NUCLEO_TARGET}/TARGET_STM")
+set(NUCLEO_STM_ID   "${NUCLEO_STM}/${TARGET_ID}")
+set(NUCLEO_STM_XID  "${NUCLEO_STM_ID}/TARGET_STM32${NUCLEO_XID}")
 
 set(LINKER_SCRIPT	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM/${LDFILE})
 
 ## Compiler variables
 set(MBED_CPU      "-mcpu=cortex-m${CORTEXM} -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp")
-set(MBED_CXXFLAGS "-fno-rtti -Wvla -c -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -MMD -fno-delete-null-pointer-checks -fomit-frame-pointer -Os -DMBED_RTOS_SINGLE_THREAD")
+set(MBED_CXXFLAGS "${MBED_CPU} -fmessage-length=0 -fno-exceptions -fno-builtin -ffunction-sections -fdata-sections -funsigned-char -fomit-frame-pointer -fno-rtti")
 
 set(MBED_CXX_DEFS ${NUCLEO_FLAGS})
 
-set(MBED_INCLUDES	
+set(MBED_INCLUDES
 	${CMAKE_CURRENT_SOURCE_DIR}/mbed
 	${CMAKE_CURRENT_SOURCE_DIR}/mbed/drivers
 	${CMAKE_CURRENT_SOURCE_DIR}/mbed/hal
@@ -73,7 +74,7 @@ set(MBED_INCLUDES
 	${NUCLEO_STM_XID}/${TARGET_NAME}
 	${NUCLEO_STM_XID}/device
 	${NUCLEO_STM_XID}/${TARGET_ID}
-	${NUCLEO_STM_ID}/device 
+	${NUCLEO_STM_ID}/device
 	${NUCLEO_TARGET}/TOOLCHAIN_GCC_ARM
 )
 
