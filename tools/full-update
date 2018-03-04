@@ -1,14 +1,14 @@
 #!/bin/sh
 
 error() {
-    echo>&2 $1
-    exit 1
+	echo>&2 "${1}"
+	exit 1
 }
 
 warning() {
-    opt=
-    [ "$1" = '-n' ] && opt='-n' && shift
-    echo $opt '\033[1m\033[33m'$*'\033[0m'
+	opt=
+	[ "${1}" = '-n' ] && opt='-n' && shift
+	echo "${opt}" '\033[1m\033[33m'$*'\033[0m'
 }
 
 uddocker=n
@@ -18,30 +18,30 @@ warning "It will also try to remove ALL unnecessary files. It can be uncomplete.
 warning "By doing this, there is no warranty your files will be safe"
 warning "Please, make a backup (e.g. git stash) before continuing"
 warning -n "Continue anyway? [y/N] "
-read ask
-[ "$ask" != y ] && error quit
+read -r ask
+[ "${ask}" != y ] && error quit
 
 if [ $# -eq 0 ]; then
-    echo -n "Update Docker? [Y/n] "
-    read uddocker
+	echo -n "Update Docker? [Y/n] "
+	read -r uddocker
 
-    echo -n "Type a list of projects to update: "
-    read projects
+	echo -n "Type a list of projects to update: "
+	read -r projects
 else
-    projects=$*
+	projects=$*
 fi
 
-[ "$uddocker" != n ] && docker build --rm -t nucleo .
+[ "${uddocker}" != n ] && docker build --rm -t nucleo .
 
-for project in $projects; do 
-    dname=$project
-    [ ! -d "$project" ] && dname=../$project
-    [ ! -d "$dname" ] && error "Error: project $project not found"
+for project in ${projects}; do
+	dname=${project}
+	[ ! -d "${project}" ] && dname=../${project}
+	[ ! -d "${dname}" ] && error "Error: project ${project} not found"
 
-    make -C $dname purge
-    rm -rf $dname/mbed $dname/.mk 
-		cp -rf mbed $dname/
-    cp -f Makefile $dname/
-		cp -f .targets.mk $dname/
+	make -C "${dname}" purge
+	rm -rf "${dname}/mbed" "${dname}/.mk "
+	cp -rf mbed "${dname}/"
+	cp -f Makefile "${dname}/"
+	cp -f .targets.mk "${dname}/"
 done
 exit 0

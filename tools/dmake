@@ -5,7 +5,7 @@
 image=sealeo/nucleo-template
 
 ## Make tool (make or cmake)
-tool=make
+tool=cmake
 
 ## Project info
 projectname=$(basename $(pwd))

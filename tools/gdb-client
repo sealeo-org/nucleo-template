@@ -6,7 +6,7 @@ help() {
 	echo '<port>    the TCP port of the GDB server'
 	echo
 	echo "Example: $0 172.34.6.2:3444"
-	exit $1
+	exit "$1"
 }
 
 
@@ -18,4 +18,4 @@ bin_file=$(make print-bin)
 src_dir="$root/src"
 gdb='arm-none-eabi-gdb'
 
-cgdb -d $gdb -- -d $src_dir -ex "target remote $1" $bin_file 
+cgdb -d $gdb -- -d $src_dir -ex "target remote $1" "$bin_file"

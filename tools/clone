@@ -1,30 +1,28 @@
 #!/bin/sh
 
 error() {
-    echo>&2 $1
-    exit 1
+	echo>&2 "${1}"
+	exit 1
 }
 
-rmlist="tools Dockerfile clone update .git"
+[ $# -ne 1 ] && error "Usage: ${0} ProjectName\nUsage: ${0} ProjectDirectory";
+_dname=${1}
+[ "$(echo "${1}"|tr -dc /|wc -c)" -eq 0 ] && _dname=../${1}
+dname=$(readlink -f "${_dname}")
+[ -d "${dname}" ] && error "Error: directory ${dname} already exists"
 
-[ $# -ne 1 ] && error "Usage: $0 ProjectName\nUsage: $0 ProjectDirectory";
-_dname=$1
-[ $(echo $1|tr -dc /|wc -c) -eq 0 ] && _dname=../$1
-dname=$(readlink -f $_dname)
-[ -d "$dname" ] && error "Error: directory $dname already exists"
+mkdir -p "${dname}" || error "Error: cannot create ${dname}"
+cp -rf mbed "${dname}/"
+cp -rf src "${dname}/"
+cp Makefile "${dname}/"
+cp .targets.mk "${dname}/"
+cp Doxyfile "${dname}/"
+cp .gitignore "${dname}/"
+cp CMakeLists.txt "${dname}/"
+cp size_info "${dname}/"
+cp targets.cmake "${dname}/"
+mkdir "${dname}/inc" "${dname}/lib"
 
-mkdir -p $dname || error "Error: cannot create $dname"
-cp -rf mbed $dname/
-cp -rf src $dname/
-cp Makefile $dname/
-cp .targets.mk $dname/
-cp Doxyfile $dname/
-cp .gitignore $dname/
-cp CMakeLists.txt $dname/
-cp size_info $dname/
-cp targets.cmake $dname/
-mkdir $dname/inc $dname/lib
-
-echo "Info: project created in $dname"
+echo "Info: project created in ${dname}"
 
 exit 0
