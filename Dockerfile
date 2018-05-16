@@ -12,7 +12,7 @@ RUN pacman --noconfirm -Syu
 RUN pacman --noconfirm --needed -S arm-none-eabi-gcc arm-none-eabi-newlib make cmake
 RUN pacman --noconfirm --needed -S arm-none-eabi-gdb cgdb
 RUN pacman --noconfirm --needed -S util-linux binutils
-RUN pacman --noconfirm --needed -S wget yaourt awk sudo file fakeroot 
+RUN pacman --noconfirm --needed -S wget yaourt awk sudo file fakeroot
 
 RUN pacman -Scc --noconfirm && \
     sudo ln -sv /usr/bin/core_perl/pod2man /usr/sbin && \
@@ -22,7 +22,7 @@ RUN pacman -Scc --noconfirm && \
 # Add user, group sudo; switch to user (for yaourt)
 RUN groupadd --system sudo && \
     useradd -m --groups sudo user
-USER user 
+USER user
 RUN yaourt --noconfirm -S jlink-software-and-documentation
 
 USER root

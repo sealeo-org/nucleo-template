@@ -30,7 +30,7 @@ dmake
 # Features
 ## Compatible devices
 
-* F303K8 (currently, any serial-based feature do not work for this device)
+* F303K8
 * F401RE
 
 ## Makefile
