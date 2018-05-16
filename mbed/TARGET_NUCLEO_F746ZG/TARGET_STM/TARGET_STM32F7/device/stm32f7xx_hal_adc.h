@@ -2,13 +2,11 @@
   ******************************************************************************
   * @file    stm32f7xx_hal_adc.h
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    22-April-2016
   * @brief   Header file of ADC HAL extension module.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -88,6 +86,7 @@ typedef struct
                                                     Parameters 'NbrOfConversion' and 'InjectedNbrOfConversion' are discarded (equivalent to set to 1).
                                        If enabled:  Conversions are performed in sequence mode (multiple ranks defined by 'NbrOfConversion'/'InjectedNbrOfConversion' and each channel rank).
                                                     Scan direction is upward: from rank1 to rank 'n'.
+                                       This parameter can be a value of @ref ADC_Scan_mode.
                                        This parameter can be set to ENABLE or DISABLE */
   uint32_t EOCSelection;          /*!< Specifies what EOC (End Of Conversion) flag is used for conversion by polling and interruption: end of conversion of each rank or complete sequence.
                                        This parameter can be a value of @ref ADC_EOCSelection.
@@ -135,7 +134,8 @@ typedef struct
   uint32_t Channel;                /*!< Specifies the channel to configure into ADC regular group.
                                         This parameter can be a value of @ref ADC_channels */
   uint32_t Rank;                   /*!< Specifies the rank in the regular group sequencer.
-                                        This parameter must be a number between Min_Data = 1 and Max_Data = 16 */
+                                        This parameter must be a number between Min_Data = 1 and Max_Data = 16 
+                                        This parameter can be a value of @ref ADC_regular_rank */
   uint32_t SamplingTime;           /*!< Sampling time value to be set for the selected channel.
                                         Unit: ADC clock cycles
                                         Conversion time is the addition of sampling time and processing time (12 ADC clock cycles at ADC resolution 12 bits, 11 cycles at 10 bits, 9 cycles at 8 bits, 7 cycles at 6 bits).
@@ -337,6 +337,38 @@ typedef struct
   * @}
   */ 
 
+/** @defgroup ADC_Scan_mode ADC sequencer scan mode
+  * @{
+  */
+#define ADC_SCAN_DISABLE         ((uint32_t)0x00000000)        /*!< Scan mode disabled */
+#define ADC_SCAN_ENABLE          ((uint32_t)0x00000001)        /*!< Scan mode enabled  */
+/**
+  * @}
+  */
+
+/** @defgroup ADC_regular_rank ADC group regular sequencer rank
+  * @{
+  */
+#define ADC_REGULAR_RANK_1    ((uint32_t)0x00000001)       /*!< ADC regular conversion rank 1  */
+#define ADC_REGULAR_RANK_2    ((uint32_t)0x00000002)       /*!< ADC regular conversion rank 2  */
+#define ADC_REGULAR_RANK_3    ((uint32_t)0x00000003)       /*!< ADC regular conversion rank 3  */
+#define ADC_REGULAR_RANK_4    ((uint32_t)0x00000004)       /*!< ADC regular conversion rank 4  */
+#define ADC_REGULAR_RANK_5    ((uint32_t)0x00000005)       /*!< ADC regular conversion rank 5  */
+#define ADC_REGULAR_RANK_6    ((uint32_t)0x00000006)       /*!< ADC regular conversion rank 6  */
+#define ADC_REGULAR_RANK_7    ((uint32_t)0x00000007)       /*!< ADC regular conversion rank 7  */
+#define ADC_REGULAR_RANK_8    ((uint32_t)0x00000008)       /*!< ADC regular conversion rank 8  */
+#define ADC_REGULAR_RANK_9    ((uint32_t)0x00000009)       /*!< ADC regular conversion rank 9  */
+#define ADC_REGULAR_RANK_10   ((uint32_t)0x0000000A)       /*!< ADC regular conversion rank 10 */
+#define ADC_REGULAR_RANK_11   ((uint32_t)0x0000000B)       /*!< ADC regular conversion rank 11 */
+#define ADC_REGULAR_RANK_12   ((uint32_t)0x0000000C)       /*!< ADC regular conversion rank 12 */
+#define ADC_REGULAR_RANK_13   ((uint32_t)0x0000000D)       /*!< ADC regular conversion rank 13 */
+#define ADC_REGULAR_RANK_14   ((uint32_t)0x0000000E)       /*!< ADC regular conversion rank 14 */
+#define ADC_REGULAR_RANK_15   ((uint32_t)0x0000000F)       /*!< ADC regular conversion rank 15 */
+#define ADC_REGULAR_RANK_16   ((uint32_t)0x00000010)       /*!< ADC regular conversion rank 16 */
+/**
+  * @}
+  */
+
 /** @defgroup ADC_channels ADC Common Channels
   * @{
   */ 
@@ -456,62 +488,62 @@ typedef struct
 /** @defgroup ADC_Exported_Macros ADC Exported Macros
   * @{
   */
-	
+
 /** @brief Reset ADC handle state
-  * @param  __HANDLE__: ADC handle
+  * @param  __HANDLE__ ADC handle
   * @retval None
   */
 #define __HAL_ADC_RESET_HANDLE_STATE(__HANDLE__) ((__HANDLE__)->State = HAL_ADC_STATE_RESET)
 
 /**
   * @brief  Enable the ADC peripheral.
-  * @param  __HANDLE__: ADC handle
+  * @param  __HANDLE__ ADC handle
   * @retval None
   */
 #define __HAL_ADC_ENABLE(__HANDLE__) ((__HANDLE__)->Instance->CR2 |=  ADC_CR2_ADON)
 
 /**
   * @brief  Disable the ADC peripheral.
-  * @param  __HANDLE__: ADC handle
+  * @param  __HANDLE__ ADC handle
   * @retval None
   */
 #define __HAL_ADC_DISABLE(__HANDLE__) ((__HANDLE__)->Instance->CR2 &=  ~ADC_CR2_ADON)
 
 /**
   * @brief  Enable the ADC end of conversion interrupt.
-  * @param  __HANDLE__: specifies the ADC Handle.
-  * @param  __INTERRUPT__: ADC Interrupt.
+  * @param  __HANDLE__ specifies the ADC Handle.
+  * @param  __INTERRUPT__ ADC Interrupt.
   * @retval None
   */
 #define __HAL_ADC_ENABLE_IT(__HANDLE__, __INTERRUPT__) (((__HANDLE__)->Instance->CR1) |= (__INTERRUPT__))
 
 /**
   * @brief  Disable the ADC end of conversion interrupt.
-  * @param  __HANDLE__: specifies the ADC Handle.
-  * @param  __INTERRUPT__: ADC interrupt.
+  * @param  __HANDLE__ specifies the ADC Handle.
+  * @param  __INTERRUPT__ ADC interrupt.
   * @retval None
   */
 #define __HAL_ADC_DISABLE_IT(__HANDLE__, __INTERRUPT__) (((__HANDLE__)->Instance->CR1) &= ~(__INTERRUPT__))
 
 /** @brief  Check if the specified ADC interrupt source is enabled or disabled.
-  * @param  __HANDLE__: specifies the ADC Handle.
-  * @param  __INTERRUPT__: specifies the ADC interrupt source to check.
+  * @param  __HANDLE__ specifies the ADC Handle.
+  * @param  __INTERRUPT__ specifies the ADC interrupt source to check.
   * @retval The new state of __IT__ (TRUE or FALSE).
   */
 #define __HAL_ADC_GET_IT_SOURCE(__HANDLE__, __INTERRUPT__)  (((__HANDLE__)->Instance->CR1 & (__INTERRUPT__)) == (__INTERRUPT__))
 
 /**
   * @brief  Clear the ADC's pending flags.
-  * @param  __HANDLE__: specifies the ADC Handle.
-  * @param  __FLAG__: ADC flag.
+  * @param  __HANDLE__ specifies the ADC Handle.
+  * @param  __FLAG__ ADC flag.
   * @retval None
   */
 #define __HAL_ADC_CLEAR_FLAG(__HANDLE__, __FLAG__) (((__HANDLE__)->Instance->SR) = ~(__FLAG__))
 
 /**
   * @brief  Get the selected ADC's flag status.
-  * @param  __HANDLE__: specifies the ADC Handle.
-  * @param  __FLAG__: ADC flag.
+  * @param  __HANDLE__ specifies the ADC Handle.
+  * @param  __FLAG__ ADC flag.
   * @retval None
   */
 #define __HAL_ADC_GET_FLAG(__HANDLE__, __FLAG__) ((((__HANDLE__)->Instance->SR) & (__FLAG__)) == (__FLAG__))
@@ -619,7 +651,7 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 
 /**
   * @brief Verification of ADC state: enabled or disabled
-  * @param __HANDLE__: ADC handle
+  * @param __HANDLE__ ADC handle
   * @retval SET (ADC enabled) or RESET (ADC disabled)
   */
 #define ADC_IS_ENABLE(__HANDLE__)                                              \
@@ -629,7 +661,7 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 /**
   * @brief Test if conversion trigger of regular group is software start
   *        or external trigger.
-  * @param __HANDLE__: ADC handle
+  * @param __HANDLE__ ADC handle
   * @retval SET (software start) or RESET (external trigger)
   */
 #define ADC_IS_SOFTWARE_START_REGULAR(__HANDLE__)                              \
@@ -638,7 +670,7 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 /**
   * @brief Test if conversion trigger of injected group is software start
   *        or external trigger.
-  * @param __HANDLE__: ADC handle
+  * @param __HANDLE__ ADC handle
   * @retval SET (software start) or RESET (external trigger)
   */
 #define ADC_IS_SOFTWARE_START_INJECTED(__HANDLE__)                             \
@@ -655,7 +687,7 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 
 /**
   * @brief Clear ADC error code (set it to error code: "no error")
-  * @param __HANDLE__: ADC handle
+  * @param __HANDLE__ ADC handle
   * @retval None
   */
 #define ADC_CLEAR_ERRORCODE(__HANDLE__)                                        \
@@ -705,7 +737,8 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
                                       ((__REGTRIG__) == ADC_EXTERNALTRIGCONV_EXT_IT11) || \
 																			((__REGTRIG__) == ADC_SOFTWARE_START))
 #define IS_ADC_DATA_ALIGN(__ALIGN__) (((__ALIGN__) == ADC_DATAALIGN_RIGHT) || \
-                                      ((__ALIGN__) == ADC_DATAALIGN_LEFT))		
+                                      ((__ALIGN__) == ADC_DATAALIGN_LEFT))
+		
                                       									
 #define IS_ADC_SAMPLE_TIME(__TIME__) (((__TIME__) == ADC_SAMPLETIME_3CYCLES)   || \
                                       ((__TIME__) == ADC_SAMPLETIME_15CYCLES)  || \
@@ -730,9 +763,29 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 #define IS_ADC_CHANNELS_TYPE(CHANNEL_TYPE) (((CHANNEL_TYPE) == ADC_ALL_CHANNELS) || \
                                             ((CHANNEL_TYPE) == ADC_REGULAR_CHANNELS) || \
                                             ((CHANNEL_TYPE) == ADC_INJECTED_CHANNELS))
+
+#define IS_ADC_REGULAR_RANK(__RANK__) (((__RANK__) == ADC_REGULAR_RANK_1 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_2 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_3 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_4 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_5 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_6 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_7 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_8 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_9 ) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_10) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_11) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_12) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_13) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_14) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_15) || \
+                                       ((__RANK__) == ADC_REGULAR_RANK_16))
+
+#define IS_ADC_SCAN_MODE(__SCAN_MODE__) (((__SCAN_MODE__) == ADC_SCAN_DISABLE) || \
+                                         ((__SCAN_MODE__) == ADC_SCAN_ENABLE))
+
 #define IS_ADC_THRESHOLD(__THRESHOLD__) ((__THRESHOLD__) <= ((uint32_t)0xFFF))
 #define IS_ADC_REGULAR_LENGTH(__LENGTH__) (((__LENGTH__) >= ((uint32_t)1)) && ((__LENGTH__) <= ((uint32_t)16)))
-#define IS_ADC_REGULAR_RANK(__RANK__) (((__RANK__) >= ((uint32_t)1)) && ((__RANK__) <= ((uint32_t)16)))
 #define IS_ADC_REGULAR_DISC_NUMBER(__NUMBER__) (((__NUMBER__) >= ((uint32_t)1)) && ((__NUMBER__) <= ((uint32_t)8)))
 #define IS_ADC_RANGE(__RESOLUTION__, __ADC_VALUE__)                                     \
    ((((__RESOLUTION__) == ADC_RESOLUTION_12B) && ((__ADC_VALUE__) <= ((uint32_t)0x0FFF))) || \
@@ -742,89 +795,89 @@ uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 
 /**
   * @brief  Set ADC Regular channel sequence length.
-  * @param  _NbrOfConversion_: Regular channel sequence length. 
+  * @param  _NbrOfConversion_ Regular channel sequence length. 
   * @retval None
   */
 #define ADC_SQR1(_NbrOfConversion_) (((_NbrOfConversion_) - (uint8_t)1) << 20)
 
 /**
   * @brief  Set the ADC's sample time for channel numbers between 10 and 18.
-  * @param  _SAMPLETIME_: Sample time parameter.
-  * @param  _CHANNELNB_: Channel number.  
+  * @param  _SAMPLETIME_ Sample time parameter.
+  * @param  _CHANNELNB_ Channel number.  
   * @retval None
   */
 #define ADC_SMPR1(_SAMPLETIME_, _CHANNELNB_) ((_SAMPLETIME_) << (3 * (((uint32_t)((uint16_t)(_CHANNELNB_))) - 10)))
 
 /**
   * @brief  Set the ADC's sample time for channel numbers between 0 and 9.
-  * @param  _SAMPLETIME_: Sample time parameter.
-  * @param  _CHANNELNB_: Channel number.  
+  * @param  _SAMPLETIME_ Sample time parameter.
+  * @param  _CHANNELNB_ Channel number.  
   * @retval None
   */
 #define ADC_SMPR2(_SAMPLETIME_, _CHANNELNB_) ((_SAMPLETIME_) << (3 * ((uint32_t)((uint16_t)(_CHANNELNB_)))))
 
 /**
   * @brief  Set the selected regular channel rank for rank between 1 and 6.
-  * @param  _CHANNELNB_: Channel number.
-  * @param  _RANKNB_: Rank number.    
+  * @param  _CHANNELNB_ Channel number.
+  * @param  _RANKNB_ Rank number.    
   * @retval None
   */
 #define ADC_SQR3_RK(_CHANNELNB_, _RANKNB_) (((uint32_t)((uint16_t)(_CHANNELNB_))) << (5 * ((_RANKNB_) - 1)))
 
 /**
   * @brief  Set the selected regular channel rank for rank between 7 and 12.
-  * @param  _CHANNELNB_: Channel number.
-  * @param  _RANKNB_: Rank number.    
+  * @param  _CHANNELNB_ Channel number.
+  * @param  _RANKNB_ Rank number.    
   * @retval None
   */
 #define ADC_SQR2_RK(_CHANNELNB_, _RANKNB_) (((uint32_t)((uint16_t)(_CHANNELNB_))) << (5 * ((_RANKNB_) - 7)))
 
 /**
   * @brief  Set the selected regular channel rank for rank between 13 and 16.
-  * @param  _CHANNELNB_: Channel number.
-  * @param  _RANKNB_: Rank number.    
+  * @param  _CHANNELNB_ Channel number.
+  * @param  _RANKNB_ Rank number.    
   * @retval None
   */
 #define ADC_SQR1_RK(_CHANNELNB_, _RANKNB_) (((uint32_t)((uint16_t)(_CHANNELNB_))) << (5 * ((_RANKNB_) - 13)))
 
 /**
   * @brief  Enable ADC continuous conversion mode.
-  * @param  _CONTINUOUS_MODE_: Continuous mode.
+  * @param  _CONTINUOUS_MODE_ Continuous mode.
   * @retval None
   */
 #define ADC_CR2_CONTINUOUS(_CONTINUOUS_MODE_) ((_CONTINUOUS_MODE_) << 1)
 
 /**
   * @brief  Configures the number of discontinuous conversions for the regular group channels.
-  * @param  _NBR_DISCONTINUOUSCONV_: Number of discontinuous conversions.
+  * @param  _NBR_DISCONTINUOUSCONV_ Number of discontinuous conversions.
   * @retval None
   */
-#define ADC_CR1_DISCONTINUOUS(_NBR_DISCONTINUOUSCONV_) (((_NBR_DISCONTINUOUSCONV_) - 1) << POSITION_VAL(ADC_CR1_DISCNUM))
+#define ADC_CR1_DISCONTINUOUS(_NBR_DISCONTINUOUSCONV_) (((_NBR_DISCONTINUOUSCONV_) - 1) << ADC_CR1_DISCNUM_Pos)
 
 /**
   * @brief  Enable ADC scan mode.
-  * @param  _SCANCONV_MODE_: Scan conversion mode.
+  * @param  _SCANCONV_MODE_ Scan conversion mode.
   * @retval None
   */
 #define ADC_CR1_SCANCONV(_SCANCONV_MODE_) ((_SCANCONV_MODE_) << 8)
 
 /**
   * @brief  Enable the ADC end of conversion selection.
-  * @param  _EOCSelection_MODE_: End of conversion selection mode.
+  * @param  _EOCSelection_MODE_ End of conversion selection mode.
   * @retval None
   */
 #define ADC_CR2_EOCSelection(_EOCSelection_MODE_) ((_EOCSelection_MODE_) << 10)
 
 /**
   * @brief  Enable the ADC DMA continuous request.
-  * @param  _DMAContReq_MODE_: DMA continuous request mode.
+  * @param  _DMAContReq_MODE_ DMA continuous request mode.
   * @retval None
   */
 #define ADC_CR2_DMAContReq(_DMAContReq_MODE_) ((_DMAContReq_MODE_) << 9)
 
 /**
   * @brief Return resolution bits in CR1 register.
-  * @param __HANDLE__: ADC handle
+  * @param __HANDLE__ ADC handle
   * @retval None
   */
 #define ADC_GET_RESOLUTION(__HANDLE__) (((__HANDLE__)->Instance->CR1) & ADC_CR1_RES)

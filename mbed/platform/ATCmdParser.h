@@ -24,6 +24,15 @@
 #include <cstdarg>
 #include "Callback.h"
 
+namespace mbed {
+
+/** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_ATCmdParser ATCmdParser class
+ * @{
+ */
+
 /**
  * Parser class for parsing AT commands
  *
@@ -42,8 +51,6 @@
  * at.recv("OK");
  * @endcode
  */
-
-namespace mbed {
 
 class ATCmdParser : private NonCopyable<ATCmdParser>
 {
@@ -117,6 +124,7 @@ public:
 
     /**
      * For backwards compatibility.
+     * @deprecated Do not use this function. This function has been replaced with set_timeout for consistency.
      *
      * Please use set_timeout(int) API only from now on.
      * Allows timeout to be changed between commands
@@ -142,6 +150,7 @@ public:
 
     /**
      * For backwards compatibility.
+     * @deprecated Do not use this function. This function has been replaced with set_delimiter for consistency.
      *
      * Please use set_delimiter(const char *) API only from now on.
      * Sets string of characters to use as line delimiters
@@ -166,6 +175,7 @@ public:
 
     /**
      * For backwards compatibility.
+     * @deprecated Do not use this function. This function has been replaced with debug_on for consistency.
      *
      * Allows traces from modem to be turned on or off
      *
@@ -299,6 +309,11 @@ public:
     */
     bool process_oob(void);
 };
+
+/**@}*/
+
+/**@}*/
+
 } //namespace mbed
 
 #endif //MBED_ATCMDPARSER_H

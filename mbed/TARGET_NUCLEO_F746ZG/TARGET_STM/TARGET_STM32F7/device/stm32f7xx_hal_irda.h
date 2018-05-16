@@ -2,13 +2,11 @@
   ******************************************************************************
   * @file    stm32f7xx_hal_irda.h
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    22-April-2016
   * @brief   Header file of IRDA HAL module.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -157,7 +155,8 @@ typedef enum
   IRDA_CLOCKSOURCE_PCLK2      = 0x01U,    /*!< PCLK2 clock source  */
   IRDA_CLOCKSOURCE_HSI        = 0x02U,    /*!< HSI clock source    */
   IRDA_CLOCKSOURCE_SYSCLK     = 0x04U,    /*!< SYSCLK clock source */
-  IRDA_CLOCKSOURCE_LSE        = 0x08U     /*!< LSE clock source     */
+  IRDA_CLOCKSOURCE_LSE        = 0x08U,    /*!< LSE clock source     */
+  IRDA_CLOCKSOURCE_UNDEFINED  = 0x10      /*!< Undefined clock source */
 }IRDA_ClockSourceTypeDef;
 
 /** 
@@ -173,13 +172,13 @@ typedef struct
 
   uint16_t                 TxXferSize;       /* IRDA Tx Transfer size              */
 
-  uint16_t                 TxXferCount;      /* IRDA Tx Transfer Counter           */
+  __IO uint16_t            TxXferCount;      /* IRDA Tx Transfer Counter           */
 
   uint8_t                  *pRxBuffPtr;      /* Pointer to IRDA Rx transfer Buffer */
 
   uint16_t                 RxXferSize;       /* IRDA Rx Transfer size              */
 
-  uint16_t                 RxXferCount;      /* IRDA Rx Transfer Counter           */
+  __IO uint16_t            RxXferCount;      /* IRDA Rx Transfer Counter           */
 
   uint16_t                 Mask;             /* IRDA RX RDR register mask         */
 
@@ -395,17 +394,71 @@ typedef struct
   */
 
 /** @brief Reset IRDA handle state
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
   * @retval None
   */
 #define __HAL_IRDA_RESET_HANDLE_STATE(__HANDLE__) ((__HANDLE__)->State = HAL_IRDA_STATE_RESET)
 
+/** @brief  Flush the IRDA DR register.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @retval None
+  */
+#define __HAL_IRDA_FLUSH_DRREGISTER(__HANDLE__)                            \
+    do{                                                                    \
+         SET_BIT((__HANDLE__)->Instance->RQR, IRDA_RXDATA_FLUSH_REQUEST); \
+         SET_BIT((__HANDLE__)->Instance->RQR, IRDA_TXDATA_FLUSH_REQUEST); \
+      } while(0)
+
+/** @brief  Clear the specified IRDA pending flag.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @param  __FLAG__ specifies the flag to check.
+  *          This parameter can be any combination of the following values:
+  *            @arg @ref IRDA_CLEAR_PEF
+  *            @arg @ref IRDA_CLEAR_FEF
+  *            @arg @ref IRDA_CLEAR_NEF
+  *            @arg @ref IRDA_CLEAR_OREF
+  *            @arg @ref IRDA_CLEAR_TCF
+  * @retval None
+  */
+#define __HAL_IRDA_CLEAR_FLAG(__HANDLE__, __FLAG__) ((__HANDLE__)->Instance->ICR = (__FLAG__))
+
+/** @brief  Clear the IRDA PE pending flag.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @retval None
+  */
+#define __HAL_IRDA_CLEAR_PEFLAG(__HANDLE__)    __HAL_IRDA_CLEAR_FLAG((__HANDLE__), IRDA_CLEAR_PEF)
+
+
+/** @brief  Clear the IRDA FE pending flag.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @retval None
+  */
+#define __HAL_IRDA_CLEAR_FEFLAG(__HANDLE__)    __HAL_IRDA_CLEAR_FLAG((__HANDLE__), IRDA_CLEAR_FEF)
+
+/** @brief  Clear the IRDA NE pending flag.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @retval None
+  */
+#define __HAL_IRDA_CLEAR_NEFLAG(__HANDLE__)    __HAL_IRDA_CLEAR_FLAG((__HANDLE__), IRDA_CLEAR_NEF)
+
+/** @brief  Clear the IRDA ORE pending flag.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @retval None
+  */
+#define __HAL_IRDA_CLEAR_OREFLAG(__HANDLE__)    __HAL_IRDA_CLEAR_FLAG((__HANDLE__), IRDA_CLEAR_OREF)
+
+/** @brief  Clear the IRDA IDLE pending flag.
+  * @param  __HANDLE__ specifies the IRDA Handle.
+  * @retval None
+  */
+#define __HAL_IRDA_CLEAR_IDLEFLAG(__HANDLE__)   __HAL_IRDA_CLEAR_FLAG((__HANDLE__), IRDA_CLEAR_IDLEF)
+
 /** @brief  Check whether the specified IRDA flag is set or not.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
   *         UART peripheral
-  * @param  __FLAG__: specifies the flag to check.
+  * @param  __FLAG__ specifies the flag to check.
   *        This parameter can be one of the following values:
   *            @arg IRDA_FLAG_REACK: Receive enable acknowledge flag
   *            @arg IRDA_FLAG_TEACK: Transmit enable acknowledge flag
@@ -425,10 +478,10 @@ typedef struct
 #define __HAL_IRDA_GET_FLAG(__HANDLE__, __FLAG__) (((__HANDLE__)->Instance->ISR & (__FLAG__)) == (__FLAG__))   
 
 /** @brief  Enable the specified IRDA interrupt.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
   *         UART peripheral
-  * @param  __INTERRUPT__: specifies the IRDA interrupt source to enable.
+  * @param  __INTERRUPT__ specifies the IRDA interrupt source to enable.
   *          This parameter can be one of the following values:
   *            @arg IRDA_IT_TXE:  Transmit Data Register empty interrupt
   *            @arg IRDA_IT_TC:   Transmission complete interrupt
@@ -443,9 +496,9 @@ typedef struct
                                                           ((__HANDLE__)->Instance->CR3 |= (1 << ((__INTERRUPT__) & IRDA_IT_MASK))))
 
 /** @brief  Disable the specified IRDA interrupt.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
-  * @param  __INTERRUPT__: specifies the IRDA interrupt source to disable.
+  * @param  __INTERRUPT__ specifies the IRDA interrupt source to disable.
   *          This parameter can be one of the following values:
   *            @arg IRDA_IT_TXE:  Transmit Data Register empty interrupt
   *            @arg IRDA_IT_TC:   Transmission complete interrupt
@@ -460,9 +513,9 @@ typedef struct
                                                            ((__HANDLE__)->Instance->CR3 &= ~ ((uint32_t)1 << ((__INTERRUPT__) & IRDA_IT_MASK))))
 
 /** @brief  Check whether the specified IRDA interrupt has occurred or not.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
-  * @param  __IT__: specifies the IRDA interrupt source to check.
+  * @param  __IT__ specifies the IRDA interrupt source to check.
   *          This parameter can be one of the following values:
   *            @arg IRDA_IT_TXE: Transmit Data Register empty interrupt
   *            @arg IRDA_IT_TC:  Transmission complete interrupt
@@ -477,9 +530,9 @@ typedef struct
 #define __HAL_IRDA_GET_IT(__HANDLE__, __IT__) ((__HANDLE__)->Instance->ISR & ((uint32_t)1 << ((__IT__)>> 0x08))) 
 
 /** @brief  Check whether the specified IRDA interrupt source is enabled.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
-  * @param  __IT__: specifies the IRDA interrupt source to check.
+  * @param  __IT__ specifies the IRDA interrupt source to check.
   *          This parameter can be one of the following values:
   *            @arg IRDA_IT_TXE: Transmit Data Register empty interrupt
   *            @arg IRDA_IT_TC:  Transmission complete interrupt
@@ -495,9 +548,9 @@ typedef struct
                                                           (__HANDLE__)->Instance->CR2 : (__HANDLE__)->Instance->CR3)) & ((uint32_t)1 << (((uint16_t)(__IT__)) & IRDA_IT_MASK)))
 
 /** @brief  Clear the specified IRDA ISR flag, in setting the proper ICR register flag.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
-  * @param  __IT_CLEAR__: specifies the interrupt clear register flag that needs to be set
+  * @param  __IT_CLEAR__ specifies the interrupt clear register flag that needs to be set
   *                       to clear the corresponding interrupt
   *          This parameter can be one of the following values:
   *            @arg IRDA_CLEAR_PEF: Parity Error Clear Flag
@@ -510,9 +563,9 @@ typedef struct
 #define __HAL_IRDA_CLEAR_IT(__HANDLE__, __IT_CLEAR__) ((__HANDLE__)->Instance->ICR |= (uint32_t)(__IT_CLEAR__))
 
 /** @brief  Set a specific IRDA request flag.
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
-  * @param  __REQ__: specifies the request flag to set
+  * @param  __REQ__ specifies the request flag to set
   *          This parameter can be one of the following values:
   *            @arg IRDA_AUTOBAUD_REQUEST: Auto-Baud Rate Request     
   *            @arg IRDA_RXDATA_FLUSH_REQUEST: Receive Data flush Request 
@@ -523,14 +576,14 @@ typedef struct
 #define __HAL_IRDA_SEND_REQ(__HANDLE__, __REQ__) ((__HANDLE__)->Instance->RQR |= (uint16_t)(__REQ__)) 
 
 /** @brief  Enable UART/USART associated to IRDA Handle
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
   * @retval None
   */
 #define __HAL_IRDA_ENABLE(__HANDLE__)                   ((__HANDLE__)->Instance->CR1 |=  USART_CR1_UE)
 
 /** @brief  Disable UART/USART associated to IRDA Handle
-  * @param  __HANDLE__: specifies the IRDA Handle.
+  * @param  __HANDLE__ specifies the IRDA Handle.
   *         The Handle Instance which can be USART1 or USART2.
   * @retval None
   */
@@ -544,7 +597,7 @@ typedef struct
 #include "stm32f7xx_hal_irda_ex.h"  
 
 /* Exported functions --------------------------------------------------------*/
-/** @addtogroup IRDA_Exported_Functions IrDA Exported Functions
+/** @addtogroup IRDA_Exported_Functions IRDA Exported Functions
   * @{
   */
 
@@ -575,12 +628,24 @@ HAL_StatusTypeDef HAL_IRDA_Receive_DMA(IRDA_HandleTypeDef *hirda, uint8_t *pData
 HAL_StatusTypeDef HAL_IRDA_DMAPause(IRDA_HandleTypeDef *hirda);
 HAL_StatusTypeDef HAL_IRDA_DMAResume(IRDA_HandleTypeDef *hirda);
 HAL_StatusTypeDef HAL_IRDA_DMAStop(IRDA_HandleTypeDef *hirda);
+/* Transfer Abort functions */
+HAL_StatusTypeDef HAL_IRDA_Abort(IRDA_HandleTypeDef *hirda);
+HAL_StatusTypeDef HAL_IRDA_AbortTransmit(IRDA_HandleTypeDef *hirda);
+HAL_StatusTypeDef HAL_IRDA_AbortReceive(IRDA_HandleTypeDef *hirda);
+HAL_StatusTypeDef HAL_IRDA_Abort_IT(IRDA_HandleTypeDef *hirda);
+HAL_StatusTypeDef HAL_IRDA_AbortTransmit_IT(IRDA_HandleTypeDef *hirda);
+HAL_StatusTypeDef HAL_IRDA_AbortReceive_IT(IRDA_HandleTypeDef *hirda);
+
 void HAL_IRDA_IRQHandler(IRDA_HandleTypeDef *hirda);
 void HAL_IRDA_TxCpltCallback(IRDA_HandleTypeDef *hirda);
 void HAL_IRDA_RxCpltCallback(IRDA_HandleTypeDef *hirda);
 void HAL_IRDA_TxHalfCpltCallback(IRDA_HandleTypeDef *hirda);
 void HAL_IRDA_RxHalfCpltCallback(IRDA_HandleTypeDef *hirda);
 void HAL_IRDA_ErrorCallback(IRDA_HandleTypeDef *hirda);
+void HAL_IRDA_AbortCpltCallback (IRDA_HandleTypeDef *hirda);
+void HAL_IRDA_AbortTransmitCpltCallback (IRDA_HandleTypeDef *hirda);
+void HAL_IRDA_AbortReceiveCpltCallback (IRDA_HandleTypeDef *hirda);
+
 /**
  * @}
  */
@@ -623,13 +688,13 @@ uint32_t HAL_IRDA_GetError(IRDA_HandleTypeDef *hirda);
   */
 
 /** @brief  Ensure that IRDA Baud rate is less or equal to maximum value
-  * @param  __BAUDRATE__: specifies the IRDA Baudrate set by the user.
+  * @param  __BAUDRATE__ specifies the IRDA Baudrate set by the user.
   * @retval True or False
   */   
 #define IS_IRDA_BAUDRATE(__BAUDRATE__) ((__BAUDRATE__) < 115201)
 
 /** @brief  Ensure that IRDA prescaler value is strictly larger than 0
-  * @param  __PRESCALER__: specifies the IRDA prescaler value set by the user.
+  * @param  __PRESCALER__ specifies the IRDA prescaler value set by the user.
   * @retval True or False
   */  
 #define IS_IRDA_PRESCALER(__PRESCALER__) ((__PRESCALER__) > 0)

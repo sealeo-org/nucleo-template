@@ -17,11 +17,17 @@
 #define MBED_DEEPSLEEPLOCK_H
 
 #include <limits.h>
-#include "platform/mbed_sleep.h"
+#include "platform/mbed_power_mgmt.h"
 #include "platform/mbed_critical.h"
 
 namespace mbed {
 
+/** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_DeepSleepLock DeepSleepLock functions
+ * @{
+ */
 
 /** RAII object for disabling, then restoring the deep sleep mode
   * Usage:
@@ -81,6 +87,11 @@ public:
         }
     }
 };
+
+/**@}*/
+
+/**@}*/
+
 
 }
 

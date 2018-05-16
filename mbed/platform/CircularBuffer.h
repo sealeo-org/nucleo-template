@@ -17,19 +17,52 @@
 #define MBED_CIRCULARBUFFER_H
 
 #include "platform/mbed_critical.h"
+#include "platform/mbed_assert.h"
 
 namespace mbed {
+
+namespace internal {
+/* Detect if CounterType of the Circular buffer is of unsigned type. */
+template<typename T>
+struct is_unsigned { static const bool value = false; };
+template<>
+struct is_unsigned<unsigned char> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned short> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned int> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned long> { static const bool value = true; };
+template<>
+struct is_unsigned<unsigned long long> { static const bool value = true; };
+};
+
 /** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_CircularBuffer CircularBuffer functions
+ * @{
+ */
 
 /** Templated Circular buffer class
  *
  *  @note Synchronization level: Interrupt safe
- *  @ingroup platform
+ *  @note CounterType must be unsigned and consistent with BufferSize
  */
 template<typename T, uint32_t BufferSize, typename CounterType = uint32_t>
 class CircularBuffer {
 public:
     CircularBuffer() : _head(0), _tail(0), _full(false) {
+        MBED_STATIC_ASSERT(
+            internal::is_unsigned<CounterType>::value,
+            "CounterType must be unsigned"
+        );
+
+        MBED_STATIC_ASSERT(
+            (sizeof(CounterType) >= sizeof(uint32_t)) ||
+            (BufferSize < (((uint64_t) 1) << (sizeof(CounterType) * 8))),
+            "Invalid BufferSize for the CounterType"
+        );
     }
 
     ~CircularBuffer() {
@@ -105,6 +138,23 @@ public:
         core_util_critical_section_exit();
     }
 
+    /** Get the number of elements currently stored in the circular_buffer */
+    CounterType size() const {
+        core_util_critical_section_enter();
+        CounterType elements;
+        if (!_full) {
+            if (_head < _tail) {
+                elements = BufferSize + _head - _tail;
+            } else {
+                elements = _head - _tail;
+            }
+        } else {
+            elements = BufferSize;
+        }
+        core_util_critical_section_exit();
+        return elements;
+    }
+    
 private:
     T _pool[BufferSize];
     volatile CounterType _head;
@@ -112,7 +162,10 @@ private:
     volatile bool _full;
 };
 
+/**@}*/
+
+/**@}*/
+
 }
 
 #endif
-

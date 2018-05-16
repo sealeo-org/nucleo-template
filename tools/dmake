@@ -17,7 +17,7 @@ mount_opts=""
 mount_opts="${mount_opts} -v /etc/passwd:/etc/passwd:ro -v /dev:/dev -v $(pwd):$(pwd)"
 
 if [ "${tool}" = "cmake" ]; then
-	script="mkdir -p $(pwd)/${builddir}; cd $(pwd)/${builddir}; cmake -DCMAKE_BUILD_TYPE=${buildtype}..; make $*; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
+	script="mkdir -p $(pwd)/${builddir}; cd $(pwd)/${builddir}; cmake -DCMAKE_BUILD_TYPE=${buildtype} ..; make $*; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
 else
 	script="cd $(pwd); make $*; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
 fi

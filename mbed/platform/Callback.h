@@ -24,12 +24,15 @@
 
 namespace mbed {
 /** \addtogroup platform */
-
+/** @{*/
+/**
+ * \defgroup platform_Callback Callback class
+ * @{
+ */
 
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename F>
 class Callback;
@@ -67,7 +70,6 @@ namespace detail {
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename R>
 class Callback<R()> {
@@ -563,7 +565,7 @@ public:
 private:
     // Stored as pointer to function and pointer to optional object
     // Function pointer is stored as union of possible function types
-    // to garuntee proper size and alignment
+    // to guarantee proper size and alignment
     struct _class;
     union {
         void (*_staticfunc)();
@@ -642,7 +644,6 @@ private:
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename R, typename A0>
 class Callback<R(A0)> {
@@ -1139,7 +1140,7 @@ public:
 private:
     // Stored as pointer to function and pointer to optional object
     // Function pointer is stored as union of possible function types
-    // to garuntee proper size and alignment
+    // to guarantee proper size and alignment
     struct _class;
     union {
         void (*_staticfunc)(A0);
@@ -1218,7 +1219,6 @@ private:
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename R, typename A0, typename A1>
 class Callback<R(A0, A1)> {
@@ -1716,7 +1716,7 @@ public:
 private:
     // Stored as pointer to function and pointer to optional object
     // Function pointer is stored as union of possible function types
-    // to garuntee proper size and alignment
+    // to guarantee proper size and alignment
     struct _class;
     union {
         void (*_staticfunc)(A0, A1);
@@ -1795,7 +1795,6 @@ private:
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename R, typename A0, typename A1, typename A2>
 class Callback<R(A0, A1, A2)> {
@@ -2294,7 +2293,7 @@ public:
 private:
     // Stored as pointer to function and pointer to optional object
     // Function pointer is stored as union of possible function types
-    // to garuntee proper size and alignment
+    // to guarantee proper size and alignment
     struct _class;
     union {
         void (*_staticfunc)(A0, A1, A2);
@@ -2373,7 +2372,6 @@ private:
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename R, typename A0, typename A1, typename A2, typename A3>
 class Callback<R(A0, A1, A2, A3)> {
@@ -2873,7 +2871,7 @@ public:
 private:
     // Stored as pointer to function and pointer to optional object
     // Function pointer is stored as union of possible function types
-    // to garuntee proper size and alignment
+    // to guarantee proper size and alignment
     struct _class;
     union {
         void (*_staticfunc)(A0, A1, A2, A3);
@@ -2952,7 +2950,6 @@ private:
 /** Callback class based on template specialization
  *
  * @note Synchronization level: Not protected
- * @ingroup platform
  */
 template <typename R, typename A0, typename A1, typename A2, typename A3, typename A4>
 class Callback<R(A0, A1, A2, A3, A4)> {
@@ -3453,7 +3450,7 @@ public:
 private:
     // Stored as pointer to function and pointer to optional object
     // Function pointer is stored as union of possible function types
-    // to garuntee proper size and alignment
+    // to guarantee proper size and alignment
     struct _class;
     union {
         void (*_staticfunc)(A0, A1, A2, A3, A4);
@@ -4546,6 +4543,9 @@ Callback<R(A0, A1, A2, A3, A4)> callback(const volatile U *obj, R (*func)(const 
     return Callback<R(A0, A1, A2, A3, A4)>(func, obj);
 }
 
+/**@}*/
+
+/**@}*/
 
 } // namespace mbed
 

@@ -34,6 +34,20 @@ extern "C" {
  * @{
  */
 
+typedef void (*ticker_irq_handler_type)(const ticker_data_t *const);
+
+/** Set low power ticker IRQ handler
+ *
+ * @param ticker_irq_handler IRQ handler to be connected
+ *
+ * @return previous ticker IRQ handler
+ *
+ * @note by default IRQ handler is set to ticker_irq_handler()
+ * @note this function is primarily for testing purposes and it's not required part of HAL implementation
+ *
+ */
+ticker_irq_handler_type set_lp_ticker_irq_handler(ticker_irq_handler_type ticker_irq_handler);
+
 /** Get low power ticker's data
  *
  * @return The low power ticker data
@@ -79,6 +93,11 @@ void lp_ticker_clear_interrupt(void);
  * The ticker should be initialized prior calling this function.
  */
 void lp_ticker_fire_interrupt(void);
+
+/** Get frequency and counter bits of this ticker.
+ *
+ */
+const ticker_info_t* lp_ticker_get_info(void);
 
 /**@}*/
 

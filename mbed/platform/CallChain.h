@@ -22,12 +22,23 @@
 #include <string.h>
 
 namespace mbed {
+
+
+typedef Callback<void()> *pFunctionPointer_t;
+class CallChainLink;
+
 /** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_CallChain CallChain class
+ * @{
+ */
 
 /** Group one or more functions in an instance of a CallChain, then call them in
  * sequence using CallChain::call(). Used mostly by the interrupt chaining code,
  * but can be used for other purposes.
  *
+ * @deprecated Do not use this class. This class is not part of the public API of mbed-os and is being removed in the future.
  * @note Synchronization level: Not protected
  *
  * Example:
@@ -60,28 +71,39 @@ namespace mbed {
  *     chain.call();
  * }
  * @endcode
- * @ingroup platform
  */
-
-typedef Callback<void()> *pFunctionPointer_t;
-class CallChainLink;
-
 class CallChain : private NonCopyable<CallChain> {
 public:
     /** Create an empty chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
      *
      *  @param size (optional) Initial size of the chain
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     CallChain(int size = 4);
+
+    /** Create an empty chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
+     */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     virtual ~CallChain();
 
     /** Add a function at the end of the chain
+     *
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
      *
      *  @param func A pointer to a void function
      *
      *  @returns
      *  The function object created for 'func'
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     pFunctionPointer_t add(Callback<void()> func);
 
     /** Add a function at the end of the chain
@@ -105,12 +127,17 @@ public:
     }
 
     /** Add a function at the beginning of the chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
+     *
      *
      *  @param func A pointer to a void function
      *
      *  @returns
      *  The function object created for 'func'
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     pFunctionPointer_t add_front(Callback<void()> func);
 
     /** Add a function at the beginning of the chain
@@ -134,47 +161,87 @@ public:
     }
 
     /** Get the number of functions in the chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
+     *
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     int size() const;
 
     /** Get a function object from the chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
      *
      *  @param i function object index
      *
      *  @returns
      *  The function object at position 'i' in the chain
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     pFunctionPointer_t get(int i) const;
 
     /** Look for a function object in the call chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
      *
      *  @param f the function object to search
      *
      *  @returns
      *  The index of the function object if found, -1 otherwise.
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     int find(pFunctionPointer_t f) const;
 
     /** Clear the call chain (remove all functions in the chain).
+     *  @deprecated Do not use this function. This class is not part of the public API of mbed-os and is being removed in the future.
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     void clear();
 
     /** Remove a function object from the chain
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
      *
      *  @arg f the function object to remove
      *
      *  @returns
      *  true if the function object was found and removed, false otherwise.
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     bool remove(pFunctionPointer_t f);
 
     /** Call all the functions in the chain in sequence
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
+     *
      */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     void call();
 
+    /** 
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
+     *
+     */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     void operator ()(void) {
         call();
     }
+
+    /** 
+     *  @deprecated 
+     *  Do not use this function, this class is not part of the public API of mbed-os and is being removed in the future.
+     *
+     */
+    MBED_DEPRECATED_SINCE("mbed-os-5.6", "This class is not part of the "
+        "public API of mbed-os and is being removed in the future.")
     pFunctionPointer_t operator [](int i) const {
         return get(i);
     }
@@ -182,6 +249,10 @@ public:
 private:
     CallChainLink *_chain;
 };
+
+/**@}*/
+
+/**@}*/
 
 } // namespace mbed
 

@@ -26,6 +26,11 @@ typedef int FILEHANDLE;
 
 namespace mbed {
 /** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_FileHandle FileHandle functions
+ * @{
+ */
 
 
 /** Class FileHandle
@@ -36,7 +41,6 @@ namespace mbed {
  *
  *  @note to create a file, @see File
  *  @note Synchronization level: Set by subclass
- *  @ingroup platform
  */
 class FileHandle : private NonCopyable<FileHandle> {
 public:
@@ -47,7 +51,7 @@ public:
      *  Devices acting as FileHandles should follow POSIX semantics:
      *
      *  * if no data is available, and non-blocking set return -EAGAIN
-     *  * if no data is available, and blocking set, wait until data is available
+     *  * if no data is available, and blocking set, wait until some data is available
      *  * If any data is available, call returns immediately
      *
      *  @param buffer   The buffer to read in to
@@ -57,6 +61,12 @@ public:
     virtual ssize_t read(void *buffer, size_t size) = 0;
 
     /** Write the contents of a buffer to a file
+     *
+     *  Devices acting as FileHandles should follow POSIX semantics:
+     *
+     * * if blocking, block until all data is written
+     * * if no data can be written, and non-blocking set, return -EAGAIN
+     * * if some data can be written, and non-blocking set, write partial
      *
      *  @param buffer   The buffer to write from
      *  @param size     The number of bytes to write 
@@ -242,17 +252,10 @@ public:
     }
 };
 
-/** Not a member function
- *  This call is equivalent to posix fdopen().
- *  It associates a Stream to an already opened file descriptor (FileHandle)
- *
- *  @param fh       a pointer to an opened file descriptor
- *  @param mode     operation upon the file descriptor, e.g., 'wb+'
- *
- *  @returns        a pointer to std::FILE
-*/
+/**@}*/
 
-std::FILE *fdopen(FileHandle *fh, const char *mode);
+/**@}*/
+
 
 } // namespace mbed
 

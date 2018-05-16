@@ -1,8 +1,8 @@
 /**************************************************************************//**
  * @file     core_armv8mbl.h
  * @brief    CMSIS ARMv8MBL Core Peripheral Access Layer Header File
- * @version  V5.0.2
- * @date     13. February 2017
+ * @version  V5.0.3
+ * @date     09. August 2017
  ******************************************************************************/
 /*
  * Copyright (c) 2009-2017 ARM Limited. All rights reserved.
@@ -59,12 +59,14 @@
   \ingroup Cortex_ARMv8MBL
   @{
  */
+ 
+#include "cmsis_version.h"
 
-/*  CMSIS cmGrebe definitions */
-#define __ARMv8MBL_CMSIS_VERSION_MAIN  ( 5U)                                       /*!< [31:16] CMSIS HAL main version */
-#define __ARMv8MBL_CMSIS_VERSION_SUB   ( 0U)                                       /*!< [15:0]  CMSIS HAL sub version */
+/*  CMSIS definitions */
+#define __ARMv8MBL_CMSIS_VERSION_MAIN  (__CM_CMSIS_VERSION_MAIN)                   /*!< \deprecated [31:16] CMSIS HAL main version */
+#define __ARMv8MBL_CMSIS_VERSION_SUB   (__CM_CMSIS_VERSION_SUB)                    /*!< \deprecated [15:0]  CMSIS HAL sub version */
 #define __ARMv8MBL_CMSIS_VERSION       ((__ARMv8MBL_CMSIS_VERSION_MAIN << 16U) | \
-                                         __ARMv8MBL_CMSIS_VERSION_SUB           )  /*!< CMSIS HAL version number */
+                                         __ARMv8MBL_CMSIS_VERSION_SUB           )  /*!< \deprecated CMSIS HAL version number */
 
 #define __CORTEX_M                     ( 2U)                                            /*!< Cortex-M Core */
 
@@ -881,9 +883,16 @@ typedef struct
   __IOM uint32_t RBAR;                   /*!< Offset: 0x00C (R/W)  MPU Region Base Address Register */
   __IOM uint32_t RLAR;                   /*!< Offset: 0x010 (R/W)  MPU Region Limit Address Register */
         uint32_t RESERVED0[7U];
+  union {
+  __IOM uint32_t MAIR[2];
+  struct {
   __IOM uint32_t MAIR0;                  /*!< Offset: 0x030 (R/W)  MPU Memory Attribute Indirection Register 0 */
   __IOM uint32_t MAIR1;                  /*!< Offset: 0x034 (R/W)  MPU Memory Attribute Indirection Register 1 */
+  };
+  };
 } MPU_Type;
+
+#define MPU_TYPE_RALIASES                  1U
 
 /* MPU Type Register Definitions */
 #define MPU_TYPE_IREGION_Pos               16U                                            /*!< MPU TYPE: IREGION Position */
@@ -1627,6 +1636,10 @@ __STATIC_INLINE uint32_t TZ_NVIC_GetPendingIRQ_NS(IRQn_Type IRQn)
   {
     return((uint32_t)(((NVIC_NS->ISPR[(((uint32_t)(int32_t)IRQn) >> 5UL)] & (1UL << (((uint32_t)(int32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
   }
+  else
+  {
+    return(0U);
+  }
 }
 
 
@@ -1729,6 +1742,13 @@ __STATIC_INLINE uint32_t TZ_NVIC_GetPriority_NS(IRQn_Type IRQn)
 
 /*@} end of CMSIS_Core_NVICFunctions */
 
+/* ##########################  MPU functions  #################################### */
+
+#if defined (__MPU_PRESENT) && (__MPU_PRESENT == 1U)
+
+#include "mpu_armv8.h"
+
+#endif
 
 /* ##########################  FPU functions  #################################### */
 /**
