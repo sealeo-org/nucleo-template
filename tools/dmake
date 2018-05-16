@@ -6,6 +6,7 @@ image=sealeo/nucleo-template
 
 ## Make tool (make or cmake)
 tool=cmake
+buildtype=Release
 
 ## Project info
 srcdir="src"
@@ -15,20 +16,10 @@ mount_opts=""
 # Script
 mount_opts="${mount_opts} -v /etc/passwd:/etc/passwd:ro -v /dev:/dev -v $(pwd):$(pwd)"
 
-while getopts ":l:" opt; do
-	case "${opt}" in
-		l)
-			mount_opts="${mount_opts} -v ${OPTARG}/${srcdir}:$(pwd)/${srcdir}/$(basename ${OPTARG})"
-			;;
-	esac
-done
-
-shift $((OPTIND-1))
-
 if [ "${tool}" = "cmake" ]; then
-	script="mkdir -p $(pwd)/${builddir}; cd $(pwd)/${builddir}; cmake -DCMAKE_BUILD_TYPE=Release ..; make ${@}; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
+	script="mkdir -p $(pwd)/${builddir}; cd $(pwd)/${builddir}; cmake -DCMAKE_BUILD_TYPE=${buildtype}..; make $*; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
 else
-	script="cd $(pwd); make ${@}; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
+	script="cd $(pwd); make $*; chown 2>/dev/null -R ${USER}: $(pwd)/${builddir}"
 fi
 
-docker run --rm --privileged ${mount_opts} "${image}" /bin/bash -c "${script}"
+docker run --rm -it --privileged ${mount_opts} "${image}" /bin/bash -c "${script}"
