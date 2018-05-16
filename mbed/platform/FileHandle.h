@@ -176,7 +176,7 @@ public:
      *  @return             0 on success
      *  @return             Negative error code on failure
      */
-    virtual int set_blocking(bool blocking)
+    virtual int set_blocking(bool)
     {
         return -1;
     }
@@ -191,7 +191,7 @@ public:
      *
      * @returns             bitmask of poll events that have occurred.
      */
-    virtual short poll(short events) const
+    virtual short poll(short) const
     {
         // Possible default for real files
         return POLLIN | POLLOUT;
@@ -236,7 +236,7 @@ public:
      *
      *  @param func     Function to call on state change
      */
-    virtual void sigio(Callback<void()> func)
+    virtual void sigio(Callback<void()>)
     {
         //Default for real files. Do nothing for real files.
     }
