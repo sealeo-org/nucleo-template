@@ -1,14 +1,15 @@
-#include <Serial.h>
+#include <AnalogIn.h>
 #include <DigitalOut.h>
-#include <wait_api.h>
+#include <Serial.h>
+#include <mbed_wait_api.h>
 
 int main() {
-	using namespace mbed;
-
-	DigitalOut led(LED3);
-	Serial usb(USBTX, USBRX);
+	mbed::DigitalOut led(LED3);
+	mbed::AnalogIn in(A0);
+	mbed::Serial usb(USBTX, USBRX);
 	for(;;) {
 		led = !led;
+		usb.printf("Hello world! (%f)\n", in.read());
 		wait(0.5f);
 	}
 }
