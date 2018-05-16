@@ -133,4 +133,6 @@ if(${FLASHSIZE} MATCHES "^0$")
 	message(FATAL_ERROR "[sealeo/nucleo-template] Invalid target ${NUCLEO}")
 endif()
 
-add_custom_target(display_size ALL DEPENDS generate_bin COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/size_info ${ELF} ${FLASHSIZE} ${RAMSIZE}")
+add_custom_target(display_size ALL
+	DEPENDS generate_bin
+	COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/size_info ${ELF} ${FLASHSIZE} ${RAMSIZE}")

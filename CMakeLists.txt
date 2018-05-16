@@ -15,7 +15,7 @@ set(ELF           ${project_name}.elf)
 set(BIN           ${project_name}.bin)
 
 ## Nucleo configuration
-set(NUCLEO        "F303K8")
+set(NUCLEO        "F401RE")
 set(DISKDIR       "/dev/disk/by-label")
 set(LABEL         "NODE_${NUCLEO}")
 set(UPLOAD_METHOD "disk") # {disk, jlink}
@@ -84,7 +84,7 @@ set(MBED_LDSYS    "-lstdc++ -lsupc++ -lc -lmbed -lgcc -lnosys")
 file(GLOB_RECURSE MBED_OBJECTS ${NUCLEO_TARGET}/*.o)
 
 # CXX configuration
-set(CXX_FLAGS         "-Wall -Wextra ${MBED_CXXFLAGS} ${UD_CXX_FLAGS}")
+set(CXX_FLAGS         "-Wall -Wextra -fdiagnostics-color=always ${MBED_CXXFLAGS} ${UD_CXX_FLAGS}")
 set(CXX_FLAGS_DEBUG   "-DDEBUG -O0 -ggdb3 -pg")
 set(CXX_FLAGS_RELEASE "-DNDEBUG -Os")
 set(CXX_DEFINITIONS   "${MBED_CXX_DEFS} ${UD_CXX_DEFS}")
@@ -107,7 +107,9 @@ target_include_directories(${ELF} PUBLIC ${MBED_INCLUDES})
 target_link_libraries(${ELF} PUBLIC ${MBED_OBJECTS})
 target_link_libraries(${ELF} PUBLIC ${CXX_LIBRARIES})
 
-add_custom_target(generate_bin ALL COMMAND bash -c "${OBJCOPY} -O binary ${ELF} ${BIN}" DEPENDS ${ELF})
+add_custom_target(generate_bin ALL
+	DEPENDS ${ELF}
+	COMMAND bash -c "${OBJCOPY} -O binary ${ELF} ${BIN}")
 
 set(DEVICE ${DISKDIR}/${LABEL})
 if(EXISTS ${DEVICE})
@@ -115,5 +117,7 @@ if(EXISTS ${DEVICE})
 		DEPENDS generate_bin
 		COMMAND mount ${DEVICE} /mnt && cp ${BIN} /mnt && sync && umount /mnt)
 else()
-	add_custom_target(upload COMMAND bash -c "echo !! error: nucleo not found")
+	add_custom_target(upload
+		DEPENDS generate_bin display_size
+		COMMAND bash -c "echo !! error: nucleo not found")
 endif()
