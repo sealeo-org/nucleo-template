@@ -12,15 +12,16 @@ dname=$(readlink -f "${_dname}")
 [ -d "${dname}" ] && error "Error: directory ${dname} already exists"
 
 mkdir -p "${dname}" || error "Error: cannot create ${dname}"
-cp -rf mbed "${dname}/"
-cp -rf src "${dname}/"
-cp Makefile "${dname}/"
-cp .targets.mk "${dname}/"
-cp Doxyfile "${dname}/"
-cp .gitignore "${dname}/"
-cp CMakeLists.txt "${dname}/"
-cp size_info "${dname}/"
-cp targets.cmake "${dname}/"
+
+cp -Trf mbed "${dname}/"
+cp -f CMakeLists.txt "${dname}/"
+cp -f targets.cmake "${dname}/"
+cp -f size_info "${dname}/"
+cp -f tools/dmake "${dname}/"
+
+cp -Trf src "${dname}/"
+cp -f .gitignore "${dname}/"
+cp -f Doxyfile "${dname}/"
 mkdir "${dname}/inc" "${dname}/lib"
 
 echo "Info: project created in ${dname}"
