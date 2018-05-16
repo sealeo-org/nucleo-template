@@ -1,34 +1,33 @@
 #!/bin/sh
 
 error() {
-    echo>&2 $1
-    exit 1
+	echo>&2 "$1"
+	exit 1
 }
 
 uddocker=n
 
-if [ $# -eq 0 ]; then
-    echo -n "Update Docker? [Y/n] "
-    read uddocker
+if [ "$#" -eq 0 ]; then
+	echo -n "Update Docker? [Y/n] "
+	read -r uddocker
 
-    echo -n "Type a list of projects to update: "
-    read projects
+	echo -n "Type a list of projects to update: "
+	read -r projects
 else
-    projects=$*
+	projects=$*
 fi
 
-[ "$uddocker" != n ] && docker build --rm -t nucleo .
+[ "${uddocker}" != n ] && docker pull sealeo/nucleo-template
 
-for project in $projects; do 
-    dname=$project
-    [ ! -d "$project" ] && dname=../$project
-    [ ! -d "$dname" ] && error "Error: project $project not found"
+for project in ${projects}; do
+	dname=${project}
+	[ ! -d "${project}" ] && dname=../${project}
+	[ ! -d "${dname}" ] && error "Error: project ${project} not found"
 
-    make -C $dname purge
-    rm -rf $dname/mbed $dname/.targets.mk
-    cp -rf mbed $dname/
-    cp -f .targets.mk $dname/
+	cp -Trf mbed "${dname}/"
+	cp -f targets.cmake "${dname}/"
+	cp -f size_info "${dname}/"
 done
 
-echo "Warning: main makefile not updated! Think about checking out new version"
+echo "Warning: CMakeLists.txt and dmake not updated! Think about checking out new version"
 exit 0
