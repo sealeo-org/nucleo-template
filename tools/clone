@@ -13,13 +13,13 @@ dname=$(readlink -f "${_dname}")
 
 mkdir -p "${dname}" || error "Error: cannot create ${dname}"
 
-cp -Trf mbed "${dname}/"
+cp -Trf mbed "${dname}/mbed"
 cp -f CMakeLists.txt "${dname}/"
 cp -f targets.cmake "${dname}/"
 cp -f size_info "${dname}/"
 cp -f tools/dmake "${dname}/"
 
-cp -Trf src "${dname}/"
+cp -Trf src "${dname}/src"
 cp -f .gitignore "${dname}/"
 cp -f Doxyfile "${dname}/"
 mkdir "${dname}/inc" "${dname}/lib"

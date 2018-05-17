@@ -24,7 +24,7 @@ for project in ${projects}; do
 	[ ! -d "${project}" ] && dname=../${project}
 	[ ! -d "${dname}" ] && error "Error: project ${project} not found"
 
-	cp -Trf mbed "${dname}/"
+	cp -Trf mbed "${dname}/mbed"
 	cp -f targets.cmake "${dname}/"
 	cp -f size_info "${dname}/"
 done

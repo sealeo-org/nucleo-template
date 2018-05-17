@@ -40,7 +40,7 @@ for project in ${projects}; do
 
 	rm -rf "${dname}/mbed"
 
-	cp -Trf mbed "${dname}/"
+	cp -Trf mbed "${dname}/mbed"
 	cp -f CMakeLists.txt "${dname}/"
 	cp -f targets.cmake "${dname}/"
 	cp -f size_info "${dname}/"
