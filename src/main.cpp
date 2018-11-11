@@ -4,7 +4,7 @@
 #include <mbed_wait_api.h>
 
 int main() {
-	mbed::DigitalOut led(LED3);
+	mbed::DigitalOut led(LED1);
 	mbed::AnalogIn in(A0);
 	mbed::Serial usb(USBTX, USBRX);
 
