@@ -1,12 +1,14 @@
-set(CMAKE_C_COMPILER          /usr/bin/arm-none-eabi-gcc)
-set(CMAKE_CXX_COMPILER        /usr/bin/arm-none-eabi-g++)
-set(CMAKE_ASM_COMPILER        /usr/bin/arm-none-eabi-as)
-set(OBJCOPY             			/usr/bin/arm-none-eabi-objcopy)
+cmake_minimum_required(VERSION 3.4)
+
+set(ARM_PATH )
+set(CMAKE_C_COMPILER     ${ARM_PATH}arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER   ${ARM_PATH}arm-none-eabi-g++)
+set(CMAKE_ASM_COMPILER   ${ARM_PATH}arm-none-eabi-as)
+set(OBJCOPY              ${ARM_PATH}arm-none-eabi-objcopy)
 
 SET(CMAKE_C_COMPILER_FORCED true)
 SET(CMAKE_CXX_COMPILER_FORCED true)
 
-cmake_minimum_required(VERSION 3.4)
 get_filename_component(project_name ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 project(${project_name})
 
